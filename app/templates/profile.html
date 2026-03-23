@@ -1,38 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Profile</title>
+        <link rel="stylesheet" href="../static/css/styles.css">
     </head>
     <body>
-            <h2>My Profile</h2> // learn how to code in user's name here
-
-        <h4> About Me </h4>
-        <p> User's desired description will go here, otherwise empty.</p>
-        <button> Edit </button>
-        
-            /* 
-            edit will allow use to change description, two buttons will appear;
-            save and cancel. Cancel will stop editing and maintain original description
-            while save will overwrite the description with the new one.
-            */
-
-        <h4> My Favourite Movies </h4>
-        <p> an editable list of 4 movies will go here.</p>
-
-        <h4> My Favourite TV Shows </h4>
-        <p> an editable list of 4 TV shows will go here.</p>
-
-        <h5> My Lists </h5> // LINK will take user to a page with all of their lists, and the option to create new ones.
-
-        <h5> My Reviews </h5> // LINK will take user to a page with all of their reviews, and the option to create new ones.
-
-        <h5> My Ratings </h5> // LINK will take user to a page with all of their ratings, and the option to create new ones. 
+        <div id="pagetop"> <!-- or should I use <header> tag? -->
             
-        <h5> My Watchlist </h5> // LINK will take user to a page with all of their watchlist items, and the option to add/remove.
+            <nav>
+                <a href="#">Profile</a> |
+                <a href="#">Activity</a> |
+                <a href="#">Films</a> |
+                <a href="#">Journal</a> |
+                <a href="#">Tv Shows</a> |
+                <a href="#">Watchlist</a> |
+                <a href="#">Lists</a> |
+                <a href="#">Likes</a> |
+                <a href="#">Reviews</a> 
+            </nav>
 
-        <h5> My Likes </h5> // LINK will take user to a page with all of their liked reviews, movies, shows.
-    
+            <img src="#" alt="Popcorn Journal Logo">
+            <a><h4> Popcorn Journal <h4></a>
+
+            <a id="sign-in" href="#"> 
+                <button class="btn btn-primary"> Sign In </button> <button> ... </button>
+            </a>
+            
+        </div> 
+        <div id="content" class="site-body"> <!-- Is there a better container tag?-->
+            <h2>My Profile</h2>
+            <img class="user" id="user-profile-image" src="./images/user.png" alt="Default user image." width="40" height="40">
+            <button> Edit Profile </button>
+            
+            <h4> About Me </h4>
+            <p> User's desired description will go here, otherwise empty.</p>
+
+            <h4> My Favourite Movies </h4>
+            <p> an editable list of 4 movies will go here.</p>
+
+            <h4> My Favourite TV Shows </h4>
+            <p> an editable list of 4 TV shows will go here.</p>
+
+            <h4> Recent Activity </h4> <a href="#"><button>MORE</button></a>
+            <p> latest movies and shows watched will appear here, can click more to view a page that will be separated by my activity and others activity</p>
+
+            <h4> Recent Reviews </h4> <a href="#"><button>MORE</button></a>
+            <p> latest movies and shows watched will appear here, can click more to view a page that will be separated by my activity and others activity</p>
+        </div> 
+        <footer> 
+            <a>About</a>
+            <a>Contact</a>
+            <a>Terms</a>
+            <a>Privacy</a>
+        </footer>
 </body>
 </html>
