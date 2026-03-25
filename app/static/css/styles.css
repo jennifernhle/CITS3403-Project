@@ -1,0 +1,112 @@
+:root {
+  --bg-color: #fdfbf7;
+  --card-bg: #ffffff;
+  --text-main: #2c3e50;
+  --border-color: #e5e0d8;
+  --accent-yellow: #e5a657;
+}
+
+body {
+  background-color: var(--bg-color);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-main);
+}
+
+.landing-feature-showcase {
+  padding: 80px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.landing-feature-showcase:last-of-type {
+  border-bottom: none;
+}
+
+.landing-feature-showcase h2 {
+  color: var(--text-main);
+  margin-bottom: 20px;
+}
+
+.landing-actions-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 2rem;
+}
+.btn-main {
+  background-color: var(--accent-yellow) !important;
+  color: #fff !important;
+  font-weight: bold !important;
+  padding: 10px 25px !important;
+  border-radius: 8px !important;
+  transition: 0.3s ease;
+}
+.btn-main:hover {
+  background-color: #b42d32 !important;
+  transform: scale(1.05);
+}
+.login-prompt {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.landing-page-demo {
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  height: auto;
+}
+
+#primary-nav {
+  background-color: var(--card-bg) !important;
+}
+
+#primary-nav .nav-link {
+  color: var(--text-main) !important;
+  transition: 0.3s color ease;
+}
+#primary-nav .navbar-brand {
+  color: var(--text-main) !important;
+  font-weight: 500;
+}
+
+#primary-nav .nav-link:hover {
+  color: var(--accent-yellow) !important;
+}
+
+#landing-about {
+  padding: 80px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#landing-welcome-banner {
+  padding: 100px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#landing-welcome-banner h2 {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.custom-footer {
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.custom-footer a {
+  color: var(--text-main) !important;
+  font-weight: 500;
+  transition: 0.3s color ease;
+}
+
+.custom-footer a:hover {
+  color: var(--accent-yellow) !important;
+  text-decoration: underline !important;
+}
+
+.custom-footer p {
+  color: #6c757d;
+  margin-top: 15px;
+}
