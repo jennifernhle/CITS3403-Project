@@ -4,6 +4,9 @@
   --text-main: #2c3e50;
   --border-color: #e5e0d8;
   --accent-yellow: #e5a657;
+  --accent-yellow-muted: #e5a65740;
+  --accent-red: #b42d32;
+  --accent-grey: #8794a1;
 }
 
 body {
@@ -32,6 +35,7 @@ body {
   gap: 15px;
   margin-top: 2rem;
 }
+
 .btn-main {
   background-color: var(--accent-yellow) !important;
   color: #fff !important;
@@ -41,11 +45,11 @@ body {
   transition: 0.3s ease;
 }
 .btn-main:hover {
-  background-color: #b42d32 !important;
-  transform: scale(1.05);
+  background-color: var(--accent-red) !important;
+  transform: scale(1.01);
 }
 .login-prompt {
-  color: #6c757d;
+  color: var(--accent-grey);
   font-size: 0.95rem;
 }
 
@@ -107,6 +111,78 @@ body {
 }
 
 .custom-footer p {
-  color: #6c757d;
+  color: var(--accent-grey);
   margin-top: 15px;
+}
+
+/* Login */
+#login-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  padding: 1.5rem !important;
+}
+
+.form-control {
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: var(--accent-yellow);
+  box-shadow: 0 0 0 0.2rem var(--accent-yellow-muted);
+  outline: none;
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+}
+
+#registration a {
+  color: var(--accent-yellow);
+  transition: color 0.2s ease;
+}
+
+#registration a:hover {
+  color: var(--accent-red);
+  text-decoration: underline !important;
+}
+
+#title {
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.form-check-input:checked {
+  background-color: var(--accent-yellow);
+  border-color: var(--accent-yellow);
+}
+
+.form-check-input:focus {
+  border-color: var(--accent-yellow);
+  box-shadow: 0 0 0 0.2rem var(--accent-yellow-muted);
+}
+
+.form-text {
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--accent-grey);
+}
+
+.form-control::placeholder {
+  color: var(--accent-grey);
+  opacity: 0.6;
+  font-size: 0.85rem;
+}
+
+.form-control:focus::placeholder {
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
 }
