@@ -144,12 +144,12 @@ body {
   font-size: 0.9rem;
 }
 
-#registration a {
+#login a {
   color: var(--accent-yellow);
   transition: color 0.2s ease;
 }
 
-#registration a:hover {
+#login a:hover {
   color: var(--accent-red);
   text-decoration: underline !important;
 }
