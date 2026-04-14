@@ -186,3 +186,37 @@ body {
   opacity: 0.4;
   transition: opacity 0.2s ease;
 }
+
+.valid {
+  color: green;
+}
+
+.invalid {
+  color: red;
+}
+
+.valid::before {
+  /* UTF-8 Dingbats - check mark symbol */
+  content: "\2713";
+  margin-right: 10px;
+}
+
+.invalid::before {
+  /* UTF-8 Dingbats - X symbol */
+  content: "\2717";
+  margin-right: 10px;
+}
+
+#passwordError.success {
+  color: green;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+#passwordError.error {
+  color: red;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}

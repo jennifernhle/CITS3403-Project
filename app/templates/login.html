@@ -61,8 +61,8 @@
           id="login-card"
         >
           <form
-            class="registration"
-            id="registration"
+            class="login-form"
+            id="login-form"
             action=""
             accept-charset="UTF-8"
             method="post"
@@ -80,6 +80,7 @@
                   id="login-email"
                   aria-describedby="emailHelp"
                   placeholder="Type your email address"
+                  required
                 />
               </div>
               <div id="emailHelp" class="form-text">
@@ -99,6 +100,7 @@
                   class="form-control"
                   id="login-password"
                   placeholder="Type your password"
+                  required
                 />
                 <span class="input-group-text bg-white toggle-password">
                   <i class="bi bi-eye-slash"></i>
@@ -126,7 +128,13 @@
 
             <!-- Sign in button -->
             <div class="d-grid gap-2 mt-4">
-              <button type="submit" class="btn btn-main">LOGIN</button>
+              <button
+                type="submit"
+                class="btn btn-main submit-btn"
+                id="submitBtn"
+              >
+                LOGIN
+              </button>
             </div>
 
             <!-- Don't have an account? -->
