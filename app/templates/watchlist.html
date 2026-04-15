@@ -12,49 +12,12 @@
     <!-- 统一CSS -->
     <!--Standardize css-->
     <link rel="stylesheet" href="../../static/css/styles.css">
-
-    <style>
-        body {
-            background-color: var(--bg-color);
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .card {
-            background-color: var(--card-bg) !important;
-            border: 1px solid var(--border-color);
-            transition: all 0.25s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
-
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .nav-link {
-            color: #333 !important;
-            transition: 0.2s;
-        }
-
-        .nav-link:hover {
-            color: #0d6efd !important;
-        }
-
-        .nav-link.active {
-            color: #0d6efd !important;
-            font-weight: 500;
-        }
-    </style>
 </head>
 
 <body>
 
 <!-- Navbar（统一） -->
-<nav class="navbar navbar-expand-md shadow-sm bg-white">
+<nav id="primary-nav" class="navbar navbar-expand-md shadow-sm">
   <div class="container">
     <a class="navbar-brand fw-bold" href="#">Popcorn Journal</a>
 
