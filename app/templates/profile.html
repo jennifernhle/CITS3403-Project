@@ -1,63 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>My Profile</title>
-        <link rel="stylesheet" href="../static/css/styles.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - Popcorn Journal</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="../static/css/styles.css" />
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
-    </head>
-    <body>
-        <div id="pagetop"> <!-- or should I use <header> tag? -->
-            
-            <nav>
-                <a href="#">Profile</a> |
-                <a href="#">Activity</a> |
-                <a href="#">Films</a> |
-                <a href="#">Journal</a> |
-                <a href="#">Tv Shows</a> |
-                <a href="#">Watchlist</a> |
-                <a href="#">Lists</a> |
-                <a href="#">Likes</a> |
-                <a href="#">Reviews</a> 
-            </nav>
+  </head>
 
-            <img src="#" alt="Popcorn Journal Logo">
-            <a><h4> Popcorn Journal <h4></a>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-md shadow-sm" id="primary-nav">
+        <div class="container">
+          <a class="navbar-brand fw-bold" href="#">Popcorn Journal</a>
 
-            <a id="sign-in" href="#"> 
-                <button class="btn btn-primary"> Sign In </button> <button> ... </button>
-            </a>
-            
-        </div> 
-        <div id="content" class="site-body"> <!-- Is there a better container tag?-->
-            <h2>My Profile</h2>
-            <img class="user" id="user-profile-image" src="./images/user.png" alt="Default user image." width="40" height="40">
-            <button> Edit Profile </button>
-            
-            <h4> About Me </h4>
-            <p> User's desired description will go here, otherwise empty.</p>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarContent"
+            aria-controls="navbarContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
 
-            <h4> My Favourite Movies </h4>
-            <p> an editable list of 4 movies will go here.</p>
+          <div class="collapse navbar-collapse mt-2 mt-md-0" id="navbarContent">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a href="#" class="nav-link active">Profile</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Activity</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Films</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Journal</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">TV Shows</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Watchlist</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Lists</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Likes</a></li>
+              <li class="nav-item"><a href="#" class="nav-link">Reviews</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
 
-            <h4> My Favourite TV Shows </h4>
-            <p> an editable list of 4 TV shows will go here.</p>
+    <main class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+          <h2 class="text-center fw-bold my-4">My Profile</h2>
 
-            <h4> Recent Activity </h4> <a href="#"><button>MORE</button></a>
-            <p> latest movies and shows watched will appear here, can click more to view a page that will be separated by my activity and others activity</p>
+          <div class="card shadow-sm border-0 p-4 p-md-5">
+            <div
+              class="d-flex flex-column flex-md-row align-items-center align-items-md-start justify-content-between gap-4 mb-5"
+            >
+              <div class="d-flex flex-column flex-md-row align-items-center gap-3">
+                <img
+                  class="rounded-circle border"
+                  id="user-profile-image"
+                  src="./images/user.png"
+                  alt="Default user image"
+                  width="90"
+                  height="90"
+                />
+                <div class="text-center text-md-start">
+                  <h3 class="fw-bold mb-1">Your Name</h3>
+                  <p class="text-secondary mb-0">Member of Popcorn Journal</p>
+                </div>
+              </div>
 
-            <h4> Recent Reviews </h4> <a href="#"><button>MORE</button></a>
-            <p> latest movies and shows watched will appear here, can click more to view a page that will be separated by my activity and others activity</p>
-        </div> 
-        <footer> 
-            <a>About</a>
-            <a>Contact</a>
-            <a>Terms</a>
-            <a>Privacy</a>
-        </footer>
-</body>
+              <button class="btn btn-main submit-btn px-4">Edit Profile</button>
+            </div>
+
+            <section class="mb-4">
+              <h4 class="fw-bold mb-3">About Me</h4>
+              <p class="text-secondary mb-0">
+                User's desired description will go here, otherwise empty.
+              </p>
+            </section>
+
+            <hr />
+
+            <section class="mb-4">
+              <h4 class="fw-bold mb-3">My Favourite Movies</h4>
+              <p class="text-secondary mb-0">
+                An editable list of 4 favourite movies will go here.
+              </p>
+            </section>
+
+            <hr />
+
+            <section class="mb-4">
+              <h4 class="fw-bold mb-3">My Favourite TV Shows</h4>
+              <p class="text-secondary mb-0">
+                An editable list of 4 favourite TV shows will go here.
+              </p>
+            </section>
+
+            <hr />
+
+            <section class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">Recent Activity</h4>
+                <a href="#" class="btn btn-outline-secondary btn-sm">More</a>
+              </div>
+              <p class="text-secondary mb-0">
+                Latest movies and shows watched will appear here. Users can click
+                “More” to view a separate activity page.
+              </p>
+            </section>
+
+            <hr />
+
+            <section>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">Recent Reviews</h4>
+                <a href="#" class="btn btn-outline-secondary btn-sm">More</a>
+              </div>
+              <p class="text-secondary mb-0">
+                Latest reviews for movies and TV shows will appear here. Users can
+                click “More” to view all reviews on a separate page.
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="custom-footer py-5 mt-5">
+      <div class="container text-center">
+        <div class="d-flex justify-content-center gap-3 mb-3 flex-wrap">
+          <a href="#" class="text-decoration-none">About</a>
+          <a href="#" class="text-decoration-none">Contact</a>
+          <a href="#" class="text-decoration-none">Terms</a>
+          <a href="#" class="text-decoration-none">Privacy</a>
+        </div>
+        <p class="small text-secondary mb-0">&copy; Popcorn Journal</p>
+      </div>
+    </footer>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
