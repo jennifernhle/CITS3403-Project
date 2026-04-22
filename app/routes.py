@@ -41,3 +41,21 @@ def search():
 @bp.route('/watchlist')
 def watchlist():
     return render_template('watchlist.html')
+
+@bp.route('/lists')
+def lists():
+    mock_lists = [
+        {'id': 3, 'name': 'Films Directed by Women', 'description': 'My favourite women-directed films.', 'movies': [1, 2, 3]},
+        {'id': 2, 'name': 'Cozy Rainy Day Movies', 'description': 'Movies for cozy rainy days.', 'movies': [1, 2]}
+    ]
+    return render_template('lists.html', lists=mock_lists)
+
+@bp.route('/logout')
+def logout():
+    return render_template('index.html')
+
+
+@bp.route('/movie/<int:movie_id>')
+def movie_detail(movie_id):
+    movie = {'title': 'Inception', 'id': movie_id, 'release_year': '2010', 'rating': 8.8}
+    return render_template('review.html', movie=movie)
