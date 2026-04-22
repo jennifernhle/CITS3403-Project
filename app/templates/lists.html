@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% block title %}My Lists{% endblock %} {% block
+content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="fw-bold" id="title">My Lists</h1>
+      <p class="text-secondary mb-0">
+        Organise and manage your cinematic collections.
+      </p>
+    </div>
+    <a href="#" class="btn btn-main">
+      <i class="bi bi-plus-lg me-2"></i> Create New List
+    </a>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title fw-bold mb-0">My Favorites</h5>
+            <span class="badge bg-light text-dark border">Public</span>
+          </div>
+          <p class="card-text text-secondary small mb-4">
+            The absolute best movies I have ever seen. High re-watch value.
+          </p>
+
+          <div class="mt-auto">
+            <p class="text-secondary small mb-3">
+              <i class="bi bi-collection-play me-1"></i> 12 movies
+            </p>
+            <div class="d-grid">
+              <a href="#" class="btn btn-outline-secondary btn-sm">View List</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title fw-bold mb-0">Weekend Watchlist</h5>
+            <span class="badge bg-light text-dark border">Private</span>
+          </div>
+          <p class="card-text text-secondary small mb-4">
+            Comedies and horror movies for the next movie night.
+          </p>
+
+          <div class="mt-auto">
+            <p class="text-secondary small mb-3">
+              <i class="bi bi-collection-play me-1"></i> 5 movies
+            </p>
+            <div class="d-grid">
+              <a href="#" class="btn btn-outline-secondary btn-sm">View List</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title fw-bold mb-0">Oscar 2026 Nominees</h5>
+            <span class="badge bg-light text-dark border">Shared</span>
+          </div>
+          <p class="card-text text-secondary small mb-4">
+            Keeping track of the awards season contenders.
+          </p>
+
+          <div class="mt-auto">
+            <p class="text-secondary small mb-3">
+              <i class="bi bi-collection-play me-1"></i> 8 movies
+            </p>
+            <div class="d-grid">
+              <a href="#" class="btn btn-outline-secondary btn-sm">View List</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+</div>

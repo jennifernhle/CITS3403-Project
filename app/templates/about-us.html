@@ -1,11 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "base.html" %} {% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center text-center mb-5">
+    <div class="col-lg-8">
+      <h1 class="fw-bold mb-3">About Popcorn Journal</h1>
+      <p class="lead text-secondary">
+        Popcorn Journal is for film enthusiasts who find it hard to keep track
+        of all the movies they have watched and want to watch. This journal is
+        an easy-to-use platform to log movie history, manage watchlists, and
+        share ratings and reviews with others.
+      </p>
+    </div>
+  </div>
+
+  <hr class="my-5" />
+
+  <div class="row g-4 text-center">
+    <div class="col-md-4">
+      <div class="p-4 about-feature-box">
+        <i class="bi bi-journal-check text-primary fs-1 mb-3"></i>
+        <h4 class="fw-bold">Track</h4>
+        <p class="text-secondary">
+          Keep a digital diary of every movie you've ever seen.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-4 about-feature-box">
+        <i class="bi bi-stars text-primary fs-1 mb-3"></i>
+        <h4 class="fw-bold">Rate</h4>
+        <p class="text-secondary">
+          Share your thoughts and scores with a community of fellow enthusiasts.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-4 about-feature-box">
+        <i class="bi bi-search-heart text-primary fs-1 mb-3"></i>
+        <h4 class="fw-bold">Discover</h4>
+        <p class="text-secondary">
+          Explore trending titles and curated lists to find your new favourite
+          film.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-feature-box rounded p-5 mt-5">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h2 class="fw-bold">The Team</h2>
+        <p class="text-secondary">
+          Jazmine Overend, Jingbo Wang, Jennifer Le, and Tony Zhang.
+        </p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="{{ url_for('main.index') }}" class="btn btn-main"
+          >Back to Home</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,164 +1,100 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Popcorn Journal</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="../static/css/styles.css" />
-  </head>
-  <body>
-    <header>
-      <!-- Navigation -->
-      <nav class="navbar navbar-expand-md shadow-sm" id="primary-nav">
-        <div class="container">
-          <a class="navbar-brand fw-bold" href="">Popcorn Journal</a>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarContent"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse mt-2 mt-md-0" id="navbarContent">
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <a href="" class="nav-link">Sign In</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">Register</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">Films</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">TV Shows</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">Lists</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
+{% extends "base.html" %} {% block content %}
 
-    <div class="container">
-      <!-- Welcome banner -->
-      <div class="row" id="landing-welcome-banner">
-        <div class="col col-md-10 col-lg-8 col-xl-6">
-          <div class="row">
-            <div class="col">
-              <img src="" alt="Popcorn Journal logo" />
-              <h2>
-                Stop searching,<br />
-                start tracking
-              </h2>
-            </div>
-          </div>
-
-          <div class="landing-actions-container">
-            <a href="" class="btn btn-main">Create a free account</a>
-            <span class="login-prompt"
-              >or <a href="">log in</a> if you have an account</span
-            >
-          </div>
-        </div>
-      </div>
-
-      <!-- About -->
-      <div class="row" id="landing-about">
-        <div class="col">
-          <h2>What is Popcorn Journal?</h2>
-          <p>
-            Popcorn Journal is the ultimate companion for film enthusiasts and
-            TV show bingers. Log your latest movie theatre adventures or TV
-            marathons in seconds. Manage your watchlist, rate your favourites,
-            and keep a digital journal of your personal watchlog.
-          </p>
-        </div>
-      </div>
-
-      <!-- Feature 1 -->
-      <div class="row landing-feature-showcase">
-        <div class="col-12 col-md-7">
+<div class="container">
+  <div class="row" id="landing-welcome-banner">
+    <div class="container py-5">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
           <img
-            src="https://plus.unsplash.com/premium_photo-1677651866184-9845765dfd37?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Popcorn Journal profile library"
-            class="landing-page-demo"
+            src="{{ url_for('static', filename='img/logo.png') }}"
+            alt="Popcorn Journal logo"
+            height="100"
+            class="me-2 mb-2"
           />
-        </div>
-        <div class="col my-auto ps-4">
-          <h2>Track your personal cinematic journey</h2>
-          <p>
-            Log all the movies and shows you've watched, are currently binging,
-            and want to see.
-          </p>
+          <h2>
+            Stop searching,<br />
+            start tracking
+          </h2>
         </div>
       </div>
 
-      <!-- Feature 2 -->
-      <div class="row landing-feature-showcase">
-        <div class="col my-auto">
-          <h2>Rate and review</h2>
-          <p>
-            Our review journal lets you capture exactly how the film or show
-            made you feel. Share your takes with the community, or keep them as
-            a private digital diary.
-          </p>
-        </div>
-        <div class="col-12 col-md-7 order-first order-md-2">
-          <img
-            src="https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2056&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Popcorn Journal page showing ratings and reviews"
-            class="landing-page-demo"
-          />
-        </div>
-      </div>
-
-      <!-- Feature 3 -->
-      <div class="row landing-feature-showcase">
-        <div class="col-12 col-md-7">
-          <img
-            src="https://plus.unsplash.com/premium_photo-1710522706751-c2f0c76cc5fd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Popcorn Journal page with custom lists"
-            class="landing-page-demo"
-          />
-        </div>
-        <div class="col my-auto">
-          <h2>Curate and organise your shows and films with lists</h2>
-          <p>
-            Create lists to organise and sort your collection of films and shows
-            exactly how you want. Whether that be "Favourite Female-Directed
-            Films" to "Tearjerker Shows", you can search for public lists, share
-            your list with the community, or keep it as a private log.
-          </p>
-        </div>
+      <div class="landing-actions-container">
+        <a href="{{ url_for('main.register') }}" class="btn btn-main"
+          >Create a free account</a
+        >
+        <span class="login-prompt"
+          >or <a href="{{ url_for('main.login') }}">log in</a> if you have an
+          account</span
+        >
       </div>
     </div>
+  </div>
 
-    <!-- Footer -->
-    <footer class="custom-footer py-5 mt-5">
-      <div class="container text-center">
-        <div class="d-flex justify-content-center gap-3 mb-3">
-          <a href="" class="text-decoration-none">About</a>
-          <a href="" class="text-decoration-none">Contact</a>
-          <a href="" class="text-decoration-none">Terms</a>
-          <a href="" class="text-decoration-none">Privacy</a>
-        </div>
-        <p class="small text-secondary mb-0">&copy; Popcorn Journal</p>
-      </div>
-    </footer>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
-  </body>
-</html>
+  <div class="row" id="landing-about">
+    <div class="col">
+      <h2 class="fw-bold">What is Popcorn Journal?</h2>
+      <p class="lead text-secondary">
+        Popcorn Journal is the ultimate companion for film enthusiasts. Log your
+        latest movie theatre adventures in seconds. Manage your watchlist, rate
+        your favourites, and keep a digital journal of your personal watchlog.
+      </p>
+    </div>
+  </div>
+
+  <div class="row landing-feature-showcase">
+    <div class="col-12 col-md-7">
+      <img
+        src="https://plus.unsplash.com/premium_photo-1677651866184-9845765dfd37?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Popcorn Journal profile library"
+        class="img-fluid rounded shadow-sm landing-page-demo"
+      />
+    </div>
+    <div class="col my-auto ps-4">
+      <h2 class="fw-bold">Track your personal cinematic journey</h2>
+      <p class="text-secondary">
+        Log all the movies you've watched, are currently binging, and want to
+        see.
+      </p>
+    </div>
+  </div>
+
+  <!-- Feature 2 -->
+  <div class="row landing-feature-showcase">
+    <div class="col my-auto">
+      <h2 class="fw-bold">Rate and review</h2>
+      <p class="text-secondary">
+        Our review journal lets you capture exactly how a film made you feel.
+        Share your takes with the community, or keep them as a private digital
+        diary.
+      </p>
+    </div>
+    <div class="col-12 col-md-7 order-first order-md-2">
+      <img
+        src="https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2056&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Popcorn Journal page showing ratings and reviews"
+        class="img-fluid rounded shadow-sm landing-page-demo"
+      />
+    </div>
+  </div>
+
+  <!-- Feature 3 -->
+  <div class="row landing-feature-showcase">
+    <div class="col-12 col-md-7">
+      <img
+        src="https://plus.unsplash.com/premium_photo-1710522706751-c2f0c76cc5fd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Popcorn Journal page with custom lists"
+        class="img-fluid rounded shadow-sm landing-page-demo"
+      />
+    </div>
+    <div class="col my-auto">
+      <h2 class="fw-bold">Curate and organise your films with lists</h2>
+      <p class="text-secondary">
+        Create lists to organise and sort your collection of films exactly how
+        you want. Whether that be "Films Directed by Women" to "Cozy Rainy Day
+        Movies", you can search for public lists, share your list with the
+        community, or keep it as a personal, private log.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
