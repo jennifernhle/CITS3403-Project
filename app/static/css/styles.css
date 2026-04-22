@@ -1,3 +1,11 @@
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --bg-color: #fdfbf7;
   --card-bg: #ffffff;
@@ -15,84 +23,52 @@ body {
   color: var(--text-main);
 }
 
-.landing-feature-showcase {
-  padding: 80px 0;
+/* ===== Buttons ===== */
+.btn-main {
+  --bs-btn-font-weight: 600;
+  --bs-btn-color: #ffffff;
+
+  --bs-btn-bg: var(--accent-red);
+  --bs-btn-border-color: var(--accent-red);
+
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: var(--accent-yellow);
+  --bs-btn-hover-border-color: var(--accent-yellow);
+
+  --bs-btn-focus-shadow-rgb: 180, 45, 50;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: var(--accent-yellow);
+  --bs-btn-active-border-color: var(--accent-yellow);
+}
+
+/* ===== Navbar ===== */
+#primary-nav {
+  background-color: var(--card-bg) !important;
   border-bottom: 1px solid var(--border-color);
 }
 
-.landing-feature-showcase:last-of-type {
-  border-bottom: none;
-}
-
-.landing-feature-showcase h2 {
-  color: var(--text-main);
-  margin-bottom: 20px;
-}
-
-.landing-actions-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 2rem;
-}
-
-.btn-main {
-  background-color: var(--accent-yellow) !important;
-  color: #fff !important;
-  font-weight: bold !important;
-  padding: 10px 25px !important;
-  border-radius: 8px !important;
-  transition: 0.3s ease;
-}
-.btn-main:hover {
-  background-color: var(--accent-red) !important;
-  transform: scale(1.01);
-}
-.login-prompt {
-  color: var(--accent-grey);
-  font-size: 0.95rem;
-}
-
-.landing-page-demo {
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
-  height: auto;
-}
-
-#primary-nav {
-  background-color: var(--card-bg) !important;
-}
-
 #primary-nav .nav-link {
-  color: var(--text-main) !important;
+  color: var(--accent-red) !important;
+  font-weight: 500;
   transition: 0.3s color ease;
 }
+
 #primary-nav .navbar-brand {
-  color: var(--text-main) !important;
-  font-weight: 500;
+  color: var(--accent-red) !important;
+  font-weight: 700;
 }
 
 #primary-nav .nav-link:hover {
   color: var(--accent-yellow) !important;
+  transform: translateY(-1px);
 }
 
-#landing-about {
-  padding: 80px 0;
-  border-bottom: 1px solid var(--border-color);
+#primary-nav .nav-link.active {
+  color: var(--accent-yellow) !important;
+  border-bottom: 2px solid var(--accent-yellow);
 }
 
-#landing-welcome-banner {
-  padding: 100px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-#landing-welcome-banner h2 {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -1px;
-}
-
+/* ===== Footer ===== */
 .custom-footer {
   background-color: var(--card-bg);
   border-top: 1px solid var(--border-color);
@@ -115,14 +91,12 @@ body {
   margin-top: 15px;
 }
 
-/* Login */
+/* ===== Forms ===== */
 #login-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  padding: 1.5rem !important;
 }
 
 .form-control {
@@ -135,43 +109,14 @@ body {
 .form-control:focus {
   border-color: var(--accent-yellow);
   box-shadow: 0 0 0 0.2rem var(--accent-yellow-muted);
-  outline: none;
 }
 
 .form-label {
   font-weight: 600;
   margin-bottom: 0.6rem;
-  font-size: 0.9rem;
-}
-
-#login a {
-  color: var(--accent-yellow);
-  transition: color 0.2s ease;
-}
-
-#login a:hover {
-  color: var(--accent-red);
-  text-decoration: underline !important;
-}
-
-#title {
-  letter-spacing: -0.5px;
-  color: var(--text-main);
-}
-
-.form-check-input:checked {
-  background-color: var(--accent-yellow);
-  border-color: var(--accent-yellow);
-}
-
-.form-check-input:focus {
-  border-color: var(--accent-yellow);
-  box-shadow: 0 0 0 0.2rem var(--accent-yellow-muted);
 }
 
 .form-text {
-  line-height: 1.5;
-  margin-top: 0.5rem;
   font-size: 0.85rem;
   color: var(--accent-grey);
 }
@@ -179,14 +124,51 @@ body {
 .form-control::placeholder {
   color: var(--accent-grey);
   opacity: 0.6;
-  font-size: 0.85rem;
 }
 
-.form-control:focus::placeholder {
-  opacity: 0.4;
-  transition: opacity 0.2s ease;
+/* ===== Cards (Search & Watchlist) ===== */
+.card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color);
+  transition: all 0.25s ease;
 }
 
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* ===== Search box ===== */
+.search-box {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== About Page ===== */
+.about-feature-box {
+  background-color: var(--card-bg);
+  color: var(--accent-red);
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  border: 0.5px solid var(--accent-grey);
+}
+
+.about-feature-box i {
+  color: var(--accent-red) !important;
+}
+
+.about-feature-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 5px var(--accent-yellow-muted);
+}
+
+/* ===== Utility ===== */
 .valid {
   color: green;
 }
@@ -196,65 +178,11 @@ body {
 }
 
 .valid::before {
-  /* UTF-8 Dingbats - check mark symbol */
-  content: "\2713";
-  margin-right: 10px;
+  content: "✔";
+  margin-right: 8px;
 }
 
 .invalid::before {
-  /* UTF-8 Dingbats - X symbol */
-  content: "\2717";
-  margin-right: 10px;
-}
-
-#passwordError.success {
-  color: green;
-  line-height: 1.5;
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-}
-
-#passwordError.error {
-  color: red;
-  line-height: 1.5;
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-}
-/* ===== Search & Watchlist Styles ===== */
-
-.card {
-    background-color: var(--card-bg) !important;
-    border: 1px solid var(--border-color);
-    transition: all 0.25s ease;
-}
-
-.card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-}
-
-.card-img-top {
-    height: 200px;
-    object-fit: cover;
-}
-
-/* Navbar (scoped) */
-#primary-nav .nav-link {
-    color: #333 !important;
-    transition: color 0.2s ease;
-}
-
-#primary-nav .nav-link:hover {
-    color: #0d6efd !important;
-}
-
-#primary-nav .nav-link.active {
-    color: #0d6efd !important;
-    font-weight: 500;
-}
-
-/* Search box */
-.search-box {
-    max-width: 600px;
-    margin: 0 auto;
+  content: "✖";
+  margin-right: 8px;
 }

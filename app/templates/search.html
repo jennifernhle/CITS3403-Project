@@ -1,177 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Search - Popcorn Journal</title>
+{% extends "base.html" %}
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
+{% block title %}Search - Popcorn Journal{% endblock %}
 
-    <link rel="stylesheet" href="../static/css/styles.css" />
+{% block content %}
+<div class="container">
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-    />
-  </head>
+  <!-- Title -->
+  <div class="row justify-content-center text-center mt-4">
+    <div class="col-md-8">
+      <h2 class="fw-bold">Search Movies</h2>
+      <p class="text-secondary">Find and explore your favourite films.</p>
+    </div>
+  </div>
 
-  <body>
-    <header>
-      <!-- Navigation -->
-      <nav class="navbar navbar-expand-md shadow-sm" id="primary-nav">
-        <div class="container">
-          <a class="navbar-brand fw-bold" href="">Popcorn Journal</a>
-
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarContent"
-            aria-controls="navbarContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-
-          <div class="collapse navbar-collapse mt-2 mt-md-0" id="navbarContent">
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <a href="" class="nav-link">Home</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link active">Search</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">Watchlist</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">Profile</a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">Logout</a>
-              </li>
-            </ul>
+  <!-- Search box -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+      <div id="login-card" class="p-4 shadow-sm">
+        <form action="{{ url_for('main.search') }}" method="GET">
+          <label for="movie-search" class="form-label">Movie title</label>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="movie-search"
+              name="query"
+              placeholder="Type a movie title..."
+              required
+            />
+            <button type="submit" class="btn btn-main px-4">
+              Search
+            </button>
           </div>
-        </div>
-      </nav>
-    </header>
-
-    <main class="container">
-      <div class="row justify-content-md-center mt-4 px-3" id="search">
-        <h2 class="text-center fw-bold my-4" id="title">Search Movies</h2>
-
-        <div
-          class="col-12 col-md-10 col-lg-8 col-xl-7 mt-2 px-3 p-4"
-          id="search-card"
-        >
-          <form
-            class="search-form"
-            id="search-form"
-            action=""
-            accept-charset="UTF-8"
-            method="get"
-          >
-            <!-- Search input -->
-            <div class="form-group my-3">
-              <label for="movie-search" class="form-label">Movie title</label>
-              <div class="input-group">
-                <span class="input-group-text bg-white border-end-0">
-                  <i class="bi bi-search text-secondary"></i>
-                </span>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="movie-search"
-                  name="query"
-                  placeholder="Type a movie title"
-                  required
-                />
-              </div>
-              <div class="form-text">
-                Search results will appear here once the database is connected.
-              </div>
-            </div>
-
-            <!-- Search button -->
-            <div class="d-grid gap-2 mt-4">
-              <button
-                type="submit"
-                class="btn btn-main submit-btn"
-                id="searchBtn"
-              >
-                SEARCH
-              </button>
-            </div>
-          </form>
-
-          <!-- Empty results container -->
-          <div class="mt-5">
-            <h5 class="fw-bold mb-3">Results</h5>
-            <div id="movie-results"></div>
-          </div>
-        </div>
+        </form>
       </div>
-    </main>
+    </div>
+  </div>
 
-    <!-- Footer -->
-    <footer class="custom-footer py-5 mt-5">
-      <div class="container text-center">
-        <div class="d-flex justify-content-center gap-3 mb-3">
-          <a href="" class="text-decoration-none">About</a>
-          <a href="" class="text-decoration-none">Contact</a>
-          <a href="" class="text-decoration-none">Terms</a>
-          <a href="" class="text-decoration-none">Privacy</a>
-        </div>
-        <p class="small text-secondary mb-0">&copy; Popcorn Journal</p>
-      </div>
-    </footer>
+  <!-- Results -->
+  <h4 class="mb-4 fw-bold">Results</h4>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
+  <div id="movie-results" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4"></div>
 
-    <script>
-      const container = document.getElementById("movie-results");
+</div>
 
-      function createMovieCard(title) {
-        const card = document.createElement("div");
-        card.className = "card p-3 mt-3";
+<!--js-->
+<script>
+function createMovieCard(title) {
+  const card = document.createElement("div");
+  card.className = "col";
 
-      card.innerHTML = `
-        <h5 class="card-title">${title}</h5>
-        <div class="d-flex justify-content-end">
-          <button class="btn btn-primary add-btn">+ Watchlist</button>
-        </div>
-        `;
+  card.innerHTML = `
+    <div class="card p-3">
+      <h5>${title}</h5>
+      <button class="btn btn-main btn-sm add-btn">+ Watchlist</button>
+    </div>
+  `;
 
-      // Click to join Watchlist
-      card.querySelector(".add-btn").addEventListener("click", function () {
-        let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+  // button
+  card.querySelector(".add-btn").addEventListener("click", function () {
+    let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
-        if (!watchlist.includes(title)) {
-          watchlist.push(title);
-        }
-
+    if (!watchlist.includes(title)) {
+      watchlist.push(title);
       localStorage.setItem("watchlist", JSON.stringify(watchlist));
 
-      console.log("Added:", title);
-      window.location.href = "watchlist.html";
-        });
+      this.textContent = "✓ Added";
+      this.disabled = true;
+    }
+  });
 
-      container.appendChild(card);
-      }
+  document.getElementById("movie-results").appendChild(card);
+}
 
-      // test data
-      createMovieCard("Interstellar");
-      createMovieCard("Inception");
+// test data
+createMovieCard("Interstellar");
+createMovieCard("Inception");
 </script>
-  </body>
-</html>
+
+{% endblock %}
