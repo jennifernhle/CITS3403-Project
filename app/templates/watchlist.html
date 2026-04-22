@@ -89,12 +89,49 @@
         </div>
         <p class="small text-secondary mb-0">&copy; Popcorn Journal</p>
       </div>
-    </footer>
-
+    </footer>   
+</div>
+    
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous">
+    </script>
+    <script>
+const container = document.getElementById("watchlist-results");
+
+// 生成卡片
+function addMovie(title) {
+  const card = document.createElement("div");
+  card.className = "card p-3 mt-3";
+
+  card.innerHTML = `
+    <h5 class="card-title">${title}</h5>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-danger btn-sm">Remove</button>
+    </div>
+  `;
+
+  // 删除功能（同时删数据🔥）
+  card.querySelector(".btn-danger").addEventListener("click", function () {
+    let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+    // 从数组中删除
+    watchlist = watchlist.filter(movie => movie !== title);
+
+    localStorage.setItem("watchlist", JSON.stringify(watchlist));
+
+    this.closest(".card").remove();
+  });
+
+  container.appendChild(card);
+}
+
+// 🔥 读取数据
+const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+// 显示所有电影
+watchlist.forEach(title => addMovie(title));
+</script>
   </body>
 </html>

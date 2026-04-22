@@ -137,5 +137,41 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+
+    <script>
+      const container = document.getElementById("movie-results");
+
+      function createMovieCard(title) {
+        const card = document.createElement("div");
+        card.className = "card p-3 mt-3";
+
+      card.innerHTML = `
+        <h5 class="card-title">${title}</h5>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-primary add-btn">+ Watchlist</button>
+        </div>
+        `;
+
+      // Click to join Watchlist
+      card.querySelector(".add-btn").addEventListener("click", function () {
+        let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+        if (!watchlist.includes(title)) {
+          watchlist.push(title);
+        }
+
+      localStorage.setItem("watchlist", JSON.stringify(watchlist));
+
+      console.log("Added:", title);
+      window.location.href = "watchlist.html";
+        });
+
+      container.appendChild(card);
+      }
+
+      // test data
+      createMovieCard("Interstellar");
+      createMovieCard("Inception");
+</script>
   </body>
 </html>
