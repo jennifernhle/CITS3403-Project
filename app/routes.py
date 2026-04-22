@@ -3,6 +3,7 @@ from flask import Blueprint, render_template
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
+@bp.route('/index') 
 def index():
     return render_template('index.html')
 
@@ -21,6 +22,14 @@ def login():
 @bp.route('/profile')
 def profile():
     return render_template('profile.html')
+
+@bp.route('/settings')
+def settings():
+    return render_template('settings.html')
+
+@bp.route('/<username>') # view another user's page
+def other_user(username):
+    return render_template('user.html', username=username)
 
 @bp.route('/register')
 def register():
