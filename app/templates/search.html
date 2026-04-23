@@ -38,27 +38,70 @@
   </div>
 
   <!-- Results -->
-  <h4 class="mb-4 fw-bold">Results</h4>
+<h4 class="mb-4 fw-bold">Results</h4>
+  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
 
-  <div id="movie-results" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4"></div>
+  {% for movie in movies %}
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+
+      <!-- picture -->
+      <img src="{{ movie.poster or 'https://picsum.photos/300/450' }}"
+     class="card-img-top"
+     style="height: 300px; object-fit: cover;"
+     alt="{{ movie.title }}">
+
+      <div class="card-body d-flex flex-column">
+
+        <!-- 标题 -->
+        <h5 class="card-title fw-bold">{{ movie.title }}</h5>
+
+        <!-- 类型/年份（可选） -->
+        <p class="card-text text-muted small">
+          {{ movie.genre }} • {{ movie.year }}
+        </p>
+
+        <div class="mt-auto d-flex justify-content-between">
+
+          <!-- 🔥 查看详情 -->
+        <a href="{{ url_for('main.movie_detail', movie_id=movie.id) }}" 
+          class="btn btn-outline-secondary btn-sm">
+            View
+        </a>
+
+          <!-- 🔥 加入watchlist -->
+          <button class="btn btn-main btn-sm add-btn" 
+                  data-title="{{ movie.title }}">
+            + Watchlist
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
 
 </div>
 
 <!--js-->
 <script>
-function createMovieCard(title) {
-  const card = document.createElement("div");
-  card.className = "col";
+document.querySelectorAll(".add-btn").forEach(button => {
 
-  card.innerHTML = `
-    <div class="card p-3">
-      <h5>${title}</h5>
-      <button class="btn btn-main btn-sm add-btn">+ Watchlist</button>
-    </div>
-  `;
+  const title = button.dataset.title;
 
-  // button
-  card.querySelector(".add-btn").addEventListener("click", function () {
+  // 页面加载检查
+  let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+  if (watchlist.includes(title)) {
+    button.textContent = "✓ Added";
+    button.disabled = true;
+  }
+
+  // 点击事件
+  button.addEventListener("click", function () {
+
     let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
     if (!watchlist.includes(title)) {
@@ -69,13 +112,7 @@ function createMovieCard(title) {
       this.disabled = true;
     }
   });
-
-  document.getElementById("movie-results").appendChild(card);
-}
-
-// test data
-createMovieCard("Interstellar");
-createMovieCard("Inception");
+});
 </script>
 
 {% endblock %}

@@ -36,8 +36,11 @@ def review():
 
 @bp.route('/search')
 def search():
-    return render_template('search.html')
-
+    movies = [
+        {"id": 1, "title": "Interstellar"},
+        {"id": 2, "title": "Inception"}
+    ]
+    return render_template('search.html', movies=movies)
 @bp.route('/watchlist')
 def watchlist():
     return render_template('watchlist.html')
