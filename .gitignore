@@ -1,5 +1,13 @@
-__pycache__/
+# virtual environments
 venv/
+.venv/
 .env
-instance/
+
+# other
+__pycache__/
 .DS_Store
+instance/
+
+# vs code
+.vscode/
+
