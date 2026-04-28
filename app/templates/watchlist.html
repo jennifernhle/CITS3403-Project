@@ -1,91 +1,55 @@
-{% extends "base.html" %} {% block title %}Watchlist - Popcorn Journal{%
-endblock %} {% block content %}
+{% extends "base.html" %}
+
+{% block title %}Watchlist - Popcorn Journal{% endblock %}
+
+{% block content %}
 
 <div class="container">
-  <h2 class="text-center fw-bold my-4" id="title">My Watchlist</h2>
+  <h2 class="text-center fw-bold my-4">My Watchlist</h2>
   <p class="text-secondary text-center">Movies you are planning to watch.</p>
 
-  <div class="row g-4">
-    <div class="col-md-6 col-lg-4">
-      <div class="card h-100 shadow-sm border-0">
-        <img
-          src="https://picsum.photos/300/200"
-          class="card-img-top"
-          alt="Inception"
-        />
-        <div class="card-body">
-          <h5 class="card-title fw-bold">Inception</h5>
-          <p class="card-text text-muted small">Sci-Fi • 2010</p>
-          <p class="text-warning mb-3">
-            <i class="bi bi-star-fill"></i> <strong>8.8</strong>
-          </p>
-          <div class="d-flex justify-content-between">
-            <a
-              href="{{ url_for('main.review') }}"
-              class="btn btn-outline-primary btn-sm px-3"
-              >View</a
-            >
-            <button class="btn btn-danger btn-sm px-3">
-              <i class="bi bi-trash"></i> Remove
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-      <div class="card h-100 shadow-sm border-0">
-        <img
-          src="https://picsum.photos/300/200"
-          class="card-img-top"
-          alt="Interstellar"
-        />
-        <div class="card-body">
-          <h5 class="card-title fw-bold">Interstellar</h5>
-          <p class="card-text text-muted small">Sci-Fi • 2014</p>
-          <p class="text-warning mb-3">
-            <i class="bi bi-star-fill"></i> <strong>8.6</strong>
-          </p>
-          <div class="d-flex justify-content-between">
-            <a
-              href="{{ url_for('main.review') }}"
-              class="btn btn-outline-primary btn-sm px-3"
-              >View</a
-            >
-            <button class="btn btn-danger btn-sm px-3">
-              <i class="bi bi-trash"></i> Remove
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-      <div class="card h-100 shadow-sm border-0">
-        <img
-          src="https://picsum.photos/300/200"
-          class="card-img-top"
-          alt="The Dark Knight"
-        />
-        <div class="card-body">
-          <h5 class="card-title fw-bold">The Dark Knight</h5>
-          <p class="card-text text-muted small">Action • 2008</p>
-          <p class="text-warning mb-3">
-            <i class="bi bi-star-fill"></i> <strong>9.0</strong>
-          </p>
-          <div class="d-flex justify-content-between">
-            <a
-              href="{{ url_for('main.review') }}"
-              class="btn btn-outline-primary btn-sm px-3"
-              >View</a
-            >
-            <button class="btn btn-danger btn-sm px-3">
-              <i class="bi bi-trash"></i> Remove
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="watchlist-results" class="row g-4"></div>
 </div>
+
+<script>
+const container = document.getElementById("watchlist-results");
+
+// create card
+function addMovie(title) {
+  const col = document.createElement("div");
+  col.className = "col-md-6 col-lg-4";
+
+  col.innerHTML = `
+    <div class="card h-100 shadow-sm">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title fw-bold">${title}</h5>
+
+        <div class="mt-auto text-end">
+          <button class="btn btn-danger btn-sm remove-btn">Remove</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // function delete
+  col.querySelector(".remove-btn").addEventListener("click", function () {
+    let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+    watchlist = watchlist.filter(movie => movie !== title);
+
+    localStorage.setItem("watchlist", JSON.stringify(watchlist));
+
+    col.remove();
+  });
+
+  container.appendChild(col);
+}
+
+// read data
+const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+// display
+watchlist.forEach(title => addMovie(title));
+</script>
+
 {% endblock %}
