@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% blocktitle %}User Settings{% endblock %} {% block content %}
+{% extends "base.html" %} 
+{% blocktitle %}{{ title }}{% endblock %} 
+{% block content %}
 
 <div class="container py-5">
   <h1 class="fw-bold mb-4">User Settings</h1>
@@ -31,7 +33,31 @@
             <button type="submit" class="btn btn-main">Save Changes</button>
         </form>
     </div>
+    <button class="btn danger-btn mt-3" onclick="deleteAccount({{ current_user.id }})">Delete Account</button>
   </div>
 </div>
+
+<script>
+  function deleteAccount(id) {
+    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      fetch("{{url_for('main.delete_account', user_id=current_user.id)}}" + id, {
+        method: 'DELETE'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Account deleted successfully.");
+          window.location.href = '/'; // Redirect to homepage or login page
+        } else {
+          alert("Error deleting account: " + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert("An error occurred while deleting the account.");
+      });
+    }
+  }
+</script>
 
 {% endblock%}
