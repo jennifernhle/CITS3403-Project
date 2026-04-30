@@ -86,13 +86,13 @@
                   id="profileDropdown"
                   data-bs-toggle="dropdown"
                 >
+                  {% if current_user.is_authenticated %}
                   <img
-                    src="{{ url_for('static', filename='img/' + current_user.profile_pic) }}"
+                    src="{{ url_for('static', filename='img/' + (current_user.profile_pic or 'user.png')) }}"
                     alt="Profile"
                     class="rounded-circle me-2"
                     style="width: 30px; height: 30px; object-fit: cover"
-                  />
-                  Hi, {{ current_user.username }}
+                  />Hi, {{ current_user.username }} {% endif %}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li>

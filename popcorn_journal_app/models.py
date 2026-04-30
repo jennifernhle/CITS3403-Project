@@ -22,6 +22,8 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(64), nullable=True)
     dob = db.Column(db.Date, nullable=True)
     user_img = db.Column(db.String(256), nullable=True) # URL or file path to user's profile image
+    profile_pic = db.Column(db.String(120), default='user.png')
+    bio = db.Column(db.String(256), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
