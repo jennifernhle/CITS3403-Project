@@ -1,10 +1,57 @@
-{% extends "base.html" %} {% block title %}User's Profile{% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}{{ title }}{% endblock %} {% block content %}
 
-<div class="container-lg">100% wide until large breakpoint</div>
-    <h1> User's Profile' </h1>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+      <img
+        class="rounded-circle border shadow-sm"
+        src="{{ url_for('static', filename=(user.user_img if user.user_img else 'img/user.png')) }}"
+        alt="User profile image"
+        width="100"
+        height="100"
+      />
+      <h2 class="text-left fw-bold my-4">{{ user.username }}</h2>
+      <div id="profile-statistics" class="d-flex gap-4 mb-4">
+        <a href="#" class="text-decoration-none text-dark">
+          <span id="follower-count">{{ follower_count }}</span>
+          <span>Followers</span>
+        </a>
+        <a href="#" class="text-decoration-none text-dark">
+          <span>{{ following_count }}</span>
+          <span>Following</span>
+        </a>
+        <a href="#" class="text-decoration-none text-dark">
+            <span> {{ user.logged_movie_count }} </span>
+            <span>Movies</span>
+        </a>
+        <a href="#" class="text-decoration-none text-dark">
+          <span>{{ user.logged_series_count }}</span>
+          <span>Series</span>
+        </a>
+        <a href="#" class="text-decoration-none text-dark">
+          <span>{{ user.list_count }}</span>
+          <span>Lists</span>
+        </a>
+      </div>
 
-    <button id="follow-button" class="btn btn-outline-primary"> Follow </button>
+      {% if current_user.is_authenticated and current_user.id != user.id %}
+      <button id="follow-button" class="btn btn-outline-primary" data-user-id="{{ user.id }}" data-action="{{ 'unfollow' if is_following else 'follow' }}">
+        {{ 'Unfollow' if is_following else 'Follow' }}
+      </button>
+      {% endif %}
+    </div>
+  </div>
 
-</div> 
+  <div class="row g-5 mt-2">
+    <div class="col-lg-8">
+      <section class="mb-5">
+        <h4 class="fw-bold border-bottom pb-2 mb-3">About</h4>
+        <p class="text-secondary">
+          {{ user.bio if user.bio else 'I have a passion for cinema.' }}
+        </p>
+      </section>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
