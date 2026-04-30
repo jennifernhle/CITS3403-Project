@@ -44,9 +44,13 @@
 
           <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav me-auto">
+              {% if current_user.is_authenticated %}
               <li class="nav-item">
-                <a href="{{ url_for('main.search')}}" class="nav-link">Films</a>
+                <a href="{{ url_for('main.search')}}" class="nav-link"
+                  >Search Films</a
+                >
               </li>
+
               <li class="nav-item">
                 <a href="{{ url_for('main.watchlist') }}" class="nav-link"
                   >Watchlist</a
@@ -55,9 +59,15 @@
               <li class="nav-item">
                 <a href="{{ url_for('main.lists') }}" class="nav-link">Lists</a>
               </li>
+              {% endif %}
             </ul>
 
             <ul class="navbar-nav ms-auto">
+              {% if current_user.is_anonymous %} {% else %} {% endif %}
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+              {% if current_user.is_anonymous %}
               <li class="nav-item">
                 <a href="{{ url_for('main.login') }}" class="nav-link"
                   >Sign In</a
@@ -68,13 +78,21 @@
                   >Register</a
                 >
               </li>
+              {% else %}
               <li class="nav-item dropdown">
                 <a
                   href="#"
                   class="nav-link dropdown-toggle d-flex align-items-center"
                   id="profileDropdown"
                   data-bs-toggle="dropdown"
-                  ><i class="bi bi-person-circle me-1"></i>
+                >
+                  <img
+                    src="{{ url_for('static', filename='img/' + current_user.profile_pic) }}"
+                    alt="Profile"
+                    class="rounded-circle me-2"
+                    style="width: 30px; height: 30px; object-fit: cover"
+                  />
+                  Hi, {{ current_user.username }}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li>
@@ -82,6 +100,13 @@
                       href="{{ url_for('main.profile') }}"
                       class="dropdown-item"
                       >My Profile</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="{{ url_for('main.edit_profile') }}"
+                      class="dropdown-item"
+                      >Edit Profile</a
                     >
                   </li>
                   <li><hr class="dropdown-divider" /></li>
@@ -94,11 +119,27 @@
                   </li>
                 </ul>
               </li>
+              {% endif %}
             </ul>
           </div>
         </div>
       </nav>
     </header>
+
+    <div class="container mt-3">
+      {% with messages = get_flashed_messages() %} {% if messages %} {% for
+      message in messages %}
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </div>
 
     <main class="container mt-4">{% block content %} {% endblock %}</main>
 

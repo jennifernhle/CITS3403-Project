@@ -11,7 +11,9 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 @bp.route('/index')
 def index():
-    return render_template('index.html', title = 'Home - Popcorn Journal')
+    if current_user.is_authenticated:
+        return render_template('home.html', title='Home')
+    return render_template('landing.html', title='Welcome')
 
 @bp.route('/about-us')
 def about_us():
@@ -160,6 +162,7 @@ def search():
     return render_template('search.html', title = 'Search - Popcorn Journal')
 
 @bp.route('/watchlist')
+@login_required
 def watchlist():
     return render_template('watchlist.html', title = 'Watchlist - Popcorn Journal')
 
