@@ -83,6 +83,7 @@ if (passwordInput && messageBox) {
 
 // Submission validation
 function validateForm() {
+  const email = document.getElementById("login-email");
   const username = document.getElementById("username");
   const password = document.getElementById("login-password");
   const confirmPassword = document.getElementById("confirm-password");
@@ -90,59 +91,45 @@ function validateForm() {
   const errorElement = document.getElementById("passwordError");
 
   let isValid = true;
-  let usernameVal = "";
-  let passwordVal = "";
-  let confirmPasswordVal = "";
 
-  if (username) {
-    usernameVal = username.value;
-  } else {
-    usernameVal = "guest";
-  }
-
-  if (password) {
-    passwordVal = password.value;
-  }
+  if (email && email.value.trim() === "") isValid = false;
+  if (username && username.value.trim() === "") isValid = false;
+  if (password && password.value.trim() === "") isValid = false;
 
   if (confirmPassword) {
-    confirmPasswordVal = confirmPassword.value;
-  }
-
-  if (!username || !password) {
-    isValid = false;
-  }
-
-  if (confirmPassword) {
-    if (confirmPasswordVal.length > 0) {
-      if (passwordVal != confirmPasswordVal) {
-        errorElement.textContent = "Passwords do not match";
-        errorElement.classList.remove("success");
-        errorElement.classList.add("error");
+    if (confirmPassword.value.length > 0) {
+      if (password.value !== confirmPassword.value) {
+        if (errorElement) {
+          errorElement.textContent = "Passwords do not match";
+          errorElement.className = "small mt-1 error";
+        }
         isValid = false;
       } else {
-        errorElement.textContent = "Passwords match";
-        errorElement.classList.remove("error");
-        errorElement.classList.add("success");
+        if (errorElement) {
+          errorElement.textContent = "Passwords match";
+          errorElement.className = "small mt-1 success";
+        }
       }
     } else {
-      errorElement.textContent = "";
+      if (errorElement) {
+        errorElement.textContent = "";
+      }
       isValid = false;
     }
   }
+
   if (submitBtn) {
-    if (isValid) {
-      submitBtn.classList.add("enabled");
-      submitBtn.disabled = false;
-    } else {
-      submitBtn.classList.remove("enabled");
-      submitBtn.disabled = true;
-    }
+    submitBtn.disabled = !isValid;
+    submitBtn.classList.toggle("enabled", isValid);
   }
 }
 
 const authForm =
   document.getElementById("registration-form") ||
   document.getElementById("login-form");
+
 if (authForm) {
   authForm.addEventListener("input", validateForm);
+
+  window.addEventListener("load", validateForm);
 }

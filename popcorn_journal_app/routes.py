@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from popcorn_journal_app import db
 from popcorn_journal_app.models import User, Movie, Series, Review, List
 import uuid
+from popcorn_journal_app.forms import RegistrationForm, LoginForm
 
 bp = Blueprint('main', __name__)
 
@@ -22,21 +23,20 @@ def forgot_password():
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        user = User.query.filter_by(username=request.form['username']).first()
-        if user and check_password_hash(user.password_hash, request.form['password']):
-            login_user(user) # This sets the current_user
-            flash('Logged in successfully.')
-            return redirect(url_for('main.profile'))
-        
-        if user and not check_password_hash(user.password_hash, request.form['password']):
-            flash('Your password is incorrect.')
-            return render_template('login.html', title = 'Login - Popcorn Journal')
-        if not user:
-            flash('This user does not exist.')
-
-    return render_template('login.html', title = 'Login - Popcorn Journal')
-
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data.strip().lower()).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember.data)
+            flash('Logged in successfully.', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for("main.index"))
+        else:
+            flash("Invalid email or password.", "danger")
+    return render_template("login.html", form=form, title="Login")
+    
 @bp.route('/profile') # view own profile page
 def profile():
     if not current_user.is_authenticated:
@@ -120,36 +120,23 @@ def settings():
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'GET':
-        return render_template('register.html', title = 'Register - Popcorn Journal')
-    if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-
-        if not username or not email or not password:
-            flash('All fields are required.')
-            return render_template('register.html', title='Register - Popcorn Journal')
-
-        if User.query.filter_by(username=username).first():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        if User.query.filter_by(username=form.username.data).first():
             flash('Username already taken.')
-            return render_template('register.html', title='Register - Popcorn Journal')
-
-        if User.query.filter_by(email=email).first():
+            return render_template('register.html', form=form)
+    
+        if User.query.filter_by(email=form.email.data).first():
             flash('Email already exists.')
-            return render_template('register.html', title='Register - Popcorn Journal')
+            return render_template('register.html', form=form)
+
+        hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
         
-        # server-side validation to check if password and confirm password match
-        if password != confirm_password:
-            flash('Passwords do not match.')
-            return render_template('register.html', title='Register - Popcorn Journal')
-
-        hashed_password = generate_password_hash(password)
-
         new_user = User(
-            username=username,
-            email=email,
+            username=form.username.data,
+            email=form.email.data,
             password_hash=hashed_password
         )
 
@@ -158,7 +145,7 @@ def register():
 
         flash('Account created. Please log in.')
         return redirect(url_for('main.login'))
-
+    return render_template('register.html', title='Register - Popcorn Journal', form=form)
 
 @bp.route('/reset-password')
 def reset_password():
