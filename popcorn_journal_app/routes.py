@@ -245,9 +245,17 @@ def edit_profile():
 def add_movie():
     form = MovieForm()
     if form.validate_on_submit():
+        existing_movie = Movie.query.filter(
+            Movie.title.ilike(form.title.data),
+            Movie.release_year == form.release_year.data
+        ).first()
+
+        if existing_movie:
+            flash(f'The movie "{form.title.data}" ({form.release_year.data}) already exists!', 'warning')
+            return render_template('add_movie.html', title='Add Movie', form=form)
+
         file = form.movie_img.data
         filename = None
-
         if file:
             filename = secure_filename(file.filename)
             file.save(os.path.join(current_app.root_path, 'static/posters', filename))
@@ -255,7 +263,7 @@ def add_movie():
         new_movie = Movie(
             title=form.title.data,
             director=form.director.data,
-            release_year=int(form.release_year.data),
+            release_year=form.release_year.data,
             genre=form.genre.data,
             movie_img=filename,
             creator_id=current_user.id
@@ -304,13 +312,13 @@ def edit_movie(movie_id):
     if form.validate_on_submit():
         existing_movie = Movie.query.filter(
             Movie.title.ilike(form.title.data),
-            Movie.director.ilike(form.director.data),
+            Movie.release_year == form.release_year.data,
             Movie.id != movie.id
         ).first()
 
         if existing_movie:
-            flash("Another movie with this title and director already exists!", "warning")
-            return render_template('add_movie.html', title='Edit Movie', form=form, movie=movie)
+            flash("A movie with this title and year already exists!", "warning")
+            return redirect(url_for('main.movie_detail', movie_id=movie.id))
         
         movie.title = form.title.data
         movie.director = form.director.data
