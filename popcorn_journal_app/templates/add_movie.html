@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5">
+  <div id="login-card" class="p-4 mx-auto" style="max-width: 600px">
+    <h2 class="fw-bold text-center mb-4">Add a New Movie</h2>
+    <form action="{{ url_for('main.add_movie') }}" method="POST">
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+        <label class="form-label">Movie Title</label>
+        <input type="text" name="title" class="form-control" required />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Director</label>
+        <input type="text" name="director" class="form-control" required />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Release Year</label>
+        <input type="number" name="release_year" class="form-control" required />
+      </div>
+
+      <button type="submit" class="btn btn-main w-100">Add to Database</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -35,3 +35,11 @@ class EditProfileForm(FlaskForm):
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
     submit = SubmitField('Update Profile')
+
+
+class MovieForm(FlaskForm):
+    title = StringField('Movie Title', validators=[DataRequired(), Length(max=128)])
+    director = StringField('Director', validators=[DataRequired(), Length(max=64)])
+    release_year = StringField('Release Year', validators=[DataRequired()])
+    # Optional: add a FileField here later for movie posters
+    submit = SubmitField('Add Movie')

@@ -3,9 +3,9 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from popcorn_journal_app import db
-from popcorn_journal_app.models import User, Movie, Series, Review, List
+from popcorn_journal_app.models import User, Movie, Review, List
 import uuid
-from popcorn_journal_app.forms import RegistrationForm, LoginForm, EditProfileForm
+from popcorn_journal_app.forms import RegistrationForm, LoginForm, EditProfileForm, MovieForm
 import os
 
 bp = Blueprint('main', __name__)
@@ -151,18 +151,35 @@ def register():
 def reset_password():
     return render_template('reset_password.html', title = 'Reset Password - Popcorn Journal')
 
-@bp.route('/review')
-def review():
-    return render_template('review.html', title = 'Reviews - Popcorn Journal')
 
 @bp.route('/search')
 def search():
-    return render_template('search.html', title = 'Search - Popcorn Journal')
+    query = request.args.get('query')
+    results = []
+    if query:
+        results = Movie.query.filter(Movie.title.contains(query)).all()
+    
+    return render_template('search.html', title='Search', results=results, query=query)
 
 @bp.route('/watchlist')
 @login_required
 def watchlist():
-    return render_template('watchlist.html', title = 'Watchlist - Popcorn Journal')
+    movies = current_user.watchlist
+    return render_template('watchlist.html', title='My Watchlist', movies=movies)
+
+@bp.route('/watchlist/toggle/<int:movie_id>', methods=['POST'])
+@login_required
+def toggle_watchlist(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    if movie in current_user.watchlist:
+        current_user.watchlist.remove(movie)
+        action = 'removed'
+    else:
+        current_user.watchlist.append(movie)
+        action = 'added'
+    
+    db.session.commit()
+    return jsonify({'success': True, 'action': action})
 
 # Browse Lists page - shows all lists created by users, with option to click into each list to see the movies/series in that list
 @bp.route('/lists')
@@ -185,9 +202,8 @@ def logout():
 
 @bp.route('/movie/<int:movie_id>')
 def movie_detail(movie_id):
-    #movie = {'title': 'Inception', 'id': movie_id, 'release_year': '2010', 'rating': 8.8}
-    movie = Movie.query.get(movie_id)
-    return render_template('review.html', movie=movie.title, title=f"{movie.title} - Popcorn Journal")
+    movie = Movie.query.get_or_404(movie_id)
+    return render_template('movie_overview.html', movie=movie, title=movie.title)
 
 
 @bp.route('/edit_profile', methods=['GET', 'POST'])
@@ -216,3 +232,44 @@ def edit_profile():
         form.last_name.data = current_user.last_name
         form.bio.data = current_user.bio
     return render_template('settings.html', title='Edit Profile', form=form)
+
+
+@bp.route('/add-movie', methods=['GET', 'POST'])
+@login_required
+def add_movie():
+    form = MovieForm()
+    if form.validate_on_submit():
+        new_movie = Movie(
+            title=form.title.data,
+            director=form.director.data,
+            release_year=int(form.release_year.data)
+        )
+        db.session.add(new_movie)
+        db.session.commit()
+        flash(f'Movie "{new_movie.title}" added to the database!', 'success')
+        return redirect(url_for('main.search'))
+    
+    return render_template('add_movie.html', title='Add Movie', form=form)
+
+@bp.route('/movie/<int:movie_id>/review', methods=['POST'])
+@login_required
+def add_review(movie_id):
+    rating = request.form.get('rating')
+    content = request.form.get('content')
+
+    if not rating:
+        flash('Please select a rating.')
+        return redirect(url_for('main.movie_detail', movie_id=movie_id))
+
+    new_review = Review(
+        rating=int(rating),
+        content=content,
+        movie_id=movie_id,
+        user_id=current_user.id
+    )
+
+    db.session.add(new_review)
+    db.session.commit()
+
+    flash('Your review has been posted!')
+    return redirect(url_for('main.movie_detail', movie_id=movie_id))

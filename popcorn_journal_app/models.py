@@ -12,6 +12,11 @@ followers = db.Table('followers',
     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
+watchlist_items = db.Table('watchlist_items',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     # USER INFO
     id = db.Column(db.Integer, primary_key=True)
@@ -24,6 +29,8 @@ class User(db.Model, UserMixin):
     user_img = db.Column(db.String(256), nullable=True) # URL or file path to user's profile image
     profile_pic = db.Column(db.String(120), default='user.png')
     bio = db.Column(db.String(256), nullable=True)
+    watchlist = db.relationship('Movie', secondary=watchlist_items, backref=db.backref('interested_users', lazy='dynamic'))
+    reviews = db.relationship('Review', backref='reviewer', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -71,6 +78,7 @@ class Movie(db.Model):
     director = db.Column(db.String(64))
     release_year = db.Column(db.Integer)
     movie_img = db.Column(db.String(256), nullable=True) # URL or file path to movie cover image
+    reviews = db.relationship('Review', backref='movie', lazy=True)
 
     def __repr__(self):
         return f'<Movie {self.title}>'
@@ -87,16 +95,19 @@ class Series(db.Model):
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id')) # author of review
-    content_type = db.Column(db.String(10))  # 'movie' or 'series'
-    content_id = db.Column(db.Integer)  # ID of the movie or series being reviewed
-    rating = db.Column(db.Float) # out of 5, can have half-stars (e.g., 4.5)
-    review_text = db.Column(db.Text)
-    date_posted = db.Column(db.DateTime) # Timestamp of when the review was posted
-    like_count = db.Column(db.Integer, default=0) # Number of likes for the review
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'), nullable=True) 
+    series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=True)
+    
+    rating = db.Column(db.Float) 
+    content = db.Column(db.Text)
+    date_posted = db.Column(db.DateTime, default=db.func.now())
+    like_count = db.Column(db.Integer, default=0)
+
+    author = db.relationship('User', backref='my_reviews', lazy=True)
 
     def __repr__(self):
-        return f'<Review {self.id} by User {self.user_id} on {self.date_posted}>'
+        return f'<Review {self.id} by {self.user_id}>'
     
 class List(db.Model):
     id = db.Column(db.Integer, primary_key=True)
