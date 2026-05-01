@@ -1,51 +1,56 @@
-{% extends "base.html" %} 
-{% block title%} {{ title }} {% endblock %} 
-{% block content %}
+{% extends "base.html" %} {% block title%} {{ title }} {% endblock %} {% block
+content %}
 
 <div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-10">
+  <div class="row align-items-center mb-4">
+    <div class="col d-flex align-items-center gap-4">
       <img
         class="rounded-circle border shadow-sm"
-        src="{{ url_for('static', filename=(user.user_img if user.user_img else 'img/user.png')) }}"
-        alt="Default user image"
+        src="{{ url_for('static', filename='img/' + (user.profile_pic or 'user.png')) }}"
+        alt="Profile image"
         width="100"
         height="100"
       />
-      <h2 class="text-left fw-bold my-4">My Profile</h2>
-      <div id= "profile-statistics" class="d-flex gap-4 mb-4">
-        <a href="#" class="text-decoration-none text-dark">
-          <span>{{ follower_count }}</span>
-          <span>Followers</span>
-        </a>
-        <a href="#" class="text-decoration-none text-dark">
-          <span>{{ following_count }}</span>
-          <span>Following</span>
-        </a>
-        <a href="#" class="text-decoration-none text-dark">
-          <span> {{ user.logged_movie_count }}</span>
-          <span>Movies</span>
-        </a>
-        <a href="#" class="text-decoration-none text-dark">
-          <span>{{ user.logged_series_count }}</span>
-          <span>Series</span>
-        </a>
-        <a href="#" class="text-decoration-none text-dark">
-          <span>{{ user.list_count }}</span>
-          <span>Lists</span>
-        </a>
+      <div>
+        <h2 class="fw-bold mb-0">{{ current_user.username }}</h2>
+        <div class="col">
+          <h2 class="fw-bold mb-0">
+            {% if current_user.first_name %} {{ current_user.first_name }} {{
+            current_user.last_name }} {% else %} {{ current_user.username }} {%
+            endif %}
+          </h2>
+        </div>
+        <p class="text-secondary mb-0">
+          Member since {% if current_user.member_since %} {{
+          current_user.member_since.strftime('%B %Y') }} {% else %} 2026 {%
+          endif %}
+        </p>
       </div>
+    </div>
 
-    </div>
-    <div class="col">
-      <h2 class="fw-bold mb-0"></h2>
-      <p class="text-secondary mb-0">Member since 2026</p>
-    </div>
     <div class="col-auto">
-      <a href="{{url_for('main.settings')}}" class="btn btn-main">
+      <a href="{{url_for('main.edit_profile')}}" class="btn btn-main">
         Edit Profile
       </a>
     </div>
+  </div>
+  <div id="profile-statistics" class="d-flex gap-4 mb-4">
+    <a href="#" class="text-decoration-none text-dark">
+      <span>{{ follower_count }}</span>
+      <span>Followers</span>
+    </a>
+    <a href="#" class="text-decoration-none text-dark">
+      <span>{{ following_count }}</span>
+      <span>Following</span>
+    </a>
+    <a href="#" class="text-decoration-none text-dark">
+      <span> {{ user.logged_movie_count }}</span>
+      <span>Movies</span>
+    </a>
+    <a href="#" class="text-decoration-none text-dark">
+      <span>{{ user.list_count }}</span>
+      <span>Lists</span>
+    </a>
   </div>
 
   <div class="row g-5">
@@ -53,8 +58,8 @@
       <section class="mb-5">
         <h4 class="fw-bold border-bottom pb-2 mb-3">About Me</h4>
         <p class="text-secondary">
-          User's desired description will go here. If no bio is provided, this
-          section will highlight the user's passion for cinema.
+          {% if user.bio %} {{ user.bio }} {% else %} This user hasn't written a
+          bio yet. {% endif %}
         </p>
       </section>
 
@@ -115,7 +120,6 @@
           </ul>
         </div>
       </div>
-
     </div>
   </div>
 </div>

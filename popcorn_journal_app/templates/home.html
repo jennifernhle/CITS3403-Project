@@ -1,0 +1,16 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5">
+  <h1>Welcome back, {{ current_user.username }}!</h1>
+  <p>This is your personalised dashboard.</p>
+
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h5>Your Stats</h5>
+        <p>Movies logged: {{ current_user.logged_movie_count }}</p>
+        <p>Followers: {{ current_user.follower_count }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

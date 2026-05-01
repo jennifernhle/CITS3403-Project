@@ -1,17 +1,20 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request
+from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request, current_app
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from popcorn_journal_app import db
 from popcorn_journal_app.models import User, Movie, Series, Review, List
 import uuid
-from popcorn_journal_app.forms import RegistrationForm, LoginForm
+from popcorn_journal_app.forms import RegistrationForm, LoginForm, EditProfileForm
+import os
 
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
-@bp.route('/index')
 def index():
-    return render_template('index.html', title = 'Home - Popcorn Journal')
+    if current_user.is_authenticated:
+        return render_template('home.html', title='Home')
+    return render_template('index.html', title='Welcome')
 
 @bp.route('/about-us')
 def about_us():
@@ -42,10 +45,12 @@ def profile():
     if not current_user.is_authenticated:
         flash('Please log in to view your profile.')
         return redirect(url_for('main.login'))
-    if current_user.is_authenticated:
-        user = User.query.get_or_404(current_user.id) # Replace with actual user retrieval logic (e.g., current_user)
-        #follower_count = len(user.followers.all())  # Calculate from database
-    return render_template('profile.html', title = 'Profile - Popcorn Journal', user=user)#, follower_count=follower_count, following_count=following_count)
+    
+    user = current_user
+    follower_count = user.followers.count()
+    following_count = user.following.count()
+
+    return render_template('profile.html', title='Profile - Popcorn Journal', user=user, follower_count=follower_count, following_count=following_count)
 
 @bp.route('/delete/<int:user_id>', methods=['POST']) # delete user account
 @login_required
@@ -109,11 +114,6 @@ def follow_user(user_id, action):
     
     return jsonify({'success': False, 'error': 'Invalid action'}), 400
 
-@bp.route('/settings')
-@login_required
-def settings():
-    return render_template('settings.html', title = 'User Settings - Popcorn Journal')
-
 #@bp.route('/<username>') # view another user's page
 #def other_user(username):
 #    return render_template('user.html', username=username)
@@ -160,6 +160,7 @@ def search():
     return render_template('search.html', title = 'Search - Popcorn Journal')
 
 @bp.route('/watchlist')
+@login_required
 def watchlist():
     return render_template('watchlist.html', title = 'Watchlist - Popcorn Journal')
 
@@ -187,3 +188,31 @@ def movie_detail(movie_id):
     #movie = {'title': 'Inception', 'id': movie_id, 'release_year': '2010', 'rating': 8.8}
     movie = Movie.query.get(movie_id)
     return render_template('review.html', movie=movie.title, title=f"{movie.title} - Popcorn Journal")
+
+
+@bp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        if form.profile_pic.data:
+            filename = secure_filename(form.profile_pic.data.filename)
+            form.profile_pic.data.save(os.path.join(current_app.root_path, 'static/img', filename))
+        
+            current_user.profile_pic = filename
+    
+        current_user.username = form.username.data
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.bio = form.bio.data
+
+        db.session.commit()
+        flash('Your profile has been updated!')
+        return redirect(url_for('main.profile'))
+    
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.bio.data = current_user.bio
+    return render_template('settings.html', title='Edit Profile', form=form)

@@ -1,61 +1,56 @@
-{% extends "base.html" %} 
-{% blocktitle %}{{ title }}{% endblock %} 
-{% block content %}
+{% extends "base.html" %} {% block title %}{{ title }}{% endblock %} {% block content %}
 
 <div class="container py-5">
   <h1 class="fw-bold mb-4">User Settings</h1>
-  <p class="text-secondary mb-4">
-    Manage your account details, preferences, and privacy settings.
-  </p>
+  <p class="text-secondary mb-4">Manage your account details, preferences, and privacy settings.</p>
 
   <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
       <h5 class="fw-bold mb-3">Account Information</h5>
-        <form>
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input
-                type="text"
-                class="form-control"
-                id="username"   
-                />
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
-                <input
-                type="email"
-                class="form-control"
-                id="email"
-                placeholder="{{ user.email }}"
-                />
-            </div>
-            
-            <button type="submit" class="btn btn-main">Save Changes</button>
-        </form>
+      <form method="POST" action="{{ url_for('main.edit_profile') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">{{ form.username.label(class="form-label") }} {{ form.username(class="form-control") }}</div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">{{ form.first_name.label(class="form-label") }} {{ form.first_name(class="form-control") }}</div>
+          <div class="col-md-6 mb-3">{{ form.last_name.label(class="form-label") }} {{ form.last_name(class="form-control") }}</div>
+        </div>
+
+        <div class="mb-3">
+          {{ form.bio.label(class="form-label fw-bold") }} {{ form.bio(class="form-control", rows="4", placeholder="Type your bio...") }} {% for error
+          in form.bio.errors %}
+          <span class="text-danger small">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.profile_pic.label(class="form-label") }} {{ form.profile_pic(class="form-control") }}
+          <div class="form-text">Currently: {{ current_user.profile_pic or 'user.png' }}</div>
+        </div>
+        {{ form.submit(class="btn btn-main") }}
+      </form>
     </div>
-    <button class="btn danger-btn mt-3" onclick="deleteAccount({{ current_user.id }})">Delete Account</button>
+    <button class="btn danger-btn mt-3" onclick="deleteAccount('{{ current_user.id }}')">Delete Account</button>
   </div>
 </div>
 
 <script>
   function deleteAccount(id) {
-    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      fetch("{{url_for('main.delete_account', user_id=current_user.id)}}" + id, {
-        method: 'DELETE'
+    if (confirm("Are you sure? This action cannot be undone.")) {
+      fetch(`/delete/${id}`, {
+        method: "POST",
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert("Account deleted successfully.");
-          window.location.href = '/'; // Redirect to homepage or login page
-        } else {
-          alert("Error deleting account: " + data.error);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert("An error occurred while deleting the account.");
-      });
+        .then((response) => {
+          if (response.redirected) {
+            window.location.href = response.url;
+          } else {
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred while deleting the account.");
+        });
     }
   }
 </script>
