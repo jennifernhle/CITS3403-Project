@@ -13,10 +13,31 @@
     <div class="col-12 col-md-10 col-lg-8 col-xl-7">
       <div id="login-card" class="p-4 shadow-sm">
         <form action="{{ url_for('main.search') }}" method="GET">
-          <label for="movie-search" class="form-label">Movie title</label>
-          <div class="input-group">
-            <input type="text" class="form-control" id="movie-search" name="query" placeholder="Type a movie title..." required />
-            <button type="submit" class="btn btn-main px-4">Search</button>
+          <div class="row g-3">
+            <!-- Text Search -->
+            <div class="col-md-7">
+              <label for="movie-search" class="form-label">Search Title or Director</label>
+              <input type="text" class="form-control" id="movie-search" name="query" 
+                     placeholder="Type here..." value="{{ request.args.get('query', '') }}">
+            </div>
+
+            <div class="col-md-5">
+              <label for="genre-filter" class="form-label">Genre</label>
+              <select name="genre" id="genre-filter" class="form-select">
+                <option value="">All Genres</option>
+                {% for val, label in form.genre.choices %}
+                  {% if val != '' %}
+                    <option value="{{ val }}" {% if request.args.get('genre') == val %}selected{% endif %}>
+                      {{ label }}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12">
+              <button type="submit" class="btn btn-main w-100 mt-2">Apply Filters</button>
+            </div>
           </div>
         </form>
       </div>
@@ -31,24 +52,20 @@
       <div class="card h-100 shadow-sm">
         <!-- picture -->
         <img
-          src="{{ movie.poster or 'https://picsum.photos/300/450' }}"
+          src="{{ url_for('static', filename='posters/' + movie.movie_img) if movie.movie_img else 'https://picsum.photos/400/600' }}"
           class="card-img-top"
           style="height: 300px; object-fit: cover"
           alt="{{ movie.title }}"
         />
 
         <div class="card-body d-flex flex-column">
-          <!-- 标题 -->
           <h5 class="card-title fw-bold">{{ movie.title }}</h5>
 
-          <!-- 类型/年份（可选） -->
-          <p class="card-text text-muted small">{{ movie.genre }} • {{ movie.year }}</p>
+          <p class="card-text text-muted small">{{ movie.genre or 'General' }} • {{ movie.release_year }}</p>
 
           <div class="mt-auto d-flex justify-content-between">
-            <!-- 🔥 查看详情 -->
             <a href="{{ url_for('main.movie_detail', movie_id=movie.id) }}" class="btn btn-outline-secondary btn-sm"> View </a>
 
-            <!-- 🔥 加入watchlist -->
             <button
               class="btn btn-main btn-sm add-btn"
               data-movie-id="{{ movie.id }}"

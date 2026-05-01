@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectField, IntegerField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp, NumberRange
 from flask_wtf.file import FileField, FileAllowed
 
 class LoginForm(FlaskForm):
@@ -40,6 +40,27 @@ class EditProfileForm(FlaskForm):
 class MovieForm(FlaskForm):
     title = StringField('Movie Title', validators=[DataRequired(), Length(max=128)])
     director = StringField('Director', validators=[DataRequired(), Length(max=64)])
-    release_year = StringField('Release Year', validators=[DataRequired()])
-    # Optional: add a FileField here later for movie posters
+    release_year = IntegerField('Release Year', validators=[DataRequired(), NumberRange(min=1888, max=2100, message="Please enter a valid year.")])
+    genre = SelectField('Genre', choices=[
+        ('', 'Select a genre...'), 
+        ('Action', 'Action'),
+        ('Adventure', 'Adventure'),
+        ('Animation', 'Animation'),
+        ('Comedy', 'Comedy'),
+        ('Documentary', 'Documentary'),
+        ('Drama', 'Drama'),
+        ('Fantasy', 'Fantasy'),
+        ('Horror', 'Horror'),
+        ('Musical', 'Musical'),
+        ('Mystery', 'Mystery'),
+        ('Romance', 'Romance'),
+        ('Sci-Fi', 'Sci-Fi'),
+        ('Sports', 'Sports'),
+        ('Thriller', 'Thriller'),
+        ('Western', 'Western'),
+        ('Other', 'Other')
+    ], validators=[DataRequired(message="Please select a genre.")])
+    movie_img = FileField('Movie Poster', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+    ])
     submit = SubmitField('Add Movie')

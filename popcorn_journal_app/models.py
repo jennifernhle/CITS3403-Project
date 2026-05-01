@@ -74,10 +74,12 @@ class User(db.Model, UserMixin):
 
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(128))
+    title = db.Column(db.String(128), index=True)
     director = db.Column(db.String(64))
     release_year = db.Column(db.Integer)
+    genre = db.Column(db.String(64))
     movie_img = db.Column(db.String(256), nullable=True) # URL or file path to movie cover image
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     reviews = db.relationship('Review', backref='movie', lazy=True)
 
     def __repr__(self):
