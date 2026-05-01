@@ -10,3 +10,6 @@ instance/
 
 # vs code
 .vscode/
+
+# database
+app.db
