@@ -53,34 +53,31 @@ def profile():
 
     return render_template('profile.html', title='Profile - Popcorn Journal', user=user, follower_count=follower_count, following_count=following_count)
 
-@bp.route('/delete/<int:user_id>', methods=['POST']) # delete user account
+@bp.route('/user/delete/<int:user_id>', methods=['POST']) # delete user account
 @login_required
 def delete_user(user_id):
-    user = User.query.filter_by(id=user_id).first()
-    if user == current_user:
-        db.session.delete(user)
-        db.session.commit()
-        flash('Your account has been deleted.')
-        return redirect(url_for('main.index'))
-    if not user == current_user:
+    if user_id != current_user.id:
         flash('You can only delete your own account.')
         return redirect(url_for('main.profile'))
-    else:
-        flash('There was an error in your request. Please try again.')
-        return redirect(url_for('main.index'))
     
-@bp.route('/delete/<int:list_id>', methods=['POST']) # delete list
+    user = User.query.get_or_404(user_id)
+    logout_user()
+    db.session.delete(user)
+    db.session.commit()
+    flash('Your account and all associated data have been deleted.')
+    return redirect(url_for('main.index'))
+    
+@bp.route('/list/delete/<int:list_id>', methods=['POST']) # delete list
 @login_required
 def delete_list(list_id):
-    list_to_delete = List.query.filter_by(id=list_id).first()
-    if list_to_delete and list_to_delete.user_id == current_user.id:
-        db.session.delete(list_to_delete)
-        db.session.commit()
-        flash(f'Your list {list_to_delete.name} has been deleted.')
-        return redirect(url_for('main.profile'))
-    else:
-        flash('You can only delete your own lists.')
-        return redirect(url_for('main.profile'))
+    list_to_delete = List.query.get_or_404(list_id)
+    if list_to_delete.user_id != current_user.id:
+        flash('You can only delete your own lists.', 'danger')
+        return redirect(url_for('main.lists'))
+    db.session.delete(list_to_delete)
+    db.session.commit()
+    flash(f'List "{list_to_delete.name}" has been deleted.', 'success')
+    return redirect(url_for('main.lists'))
 
 @bp.route('/user/<int:user_id>') # view another user's page
 def other_user(user_id):
@@ -189,11 +186,8 @@ def toggle_watchlist(movie_id):
 # Browse Lists page - shows all lists created by users, with option to click into each list to see the movies/series in that list
 @bp.route('/lists')
 def lists():
-    mock_lists = [
-        {'id': 3, 'name': 'Films Directed by Women', 'description': 'My favourite women-directed films.', 'movies': [1, 2, 3]},
-        {'id': 2, 'name': 'Cozy Rainy Day Movies', 'description': 'Movies for cozy rainy days.', 'movies': [1, 2]}
-    ]
-    return render_template('lists.html', lists=mock_lists, title = 'Lists - Popcorn Journal')
+    user_lists = List.query.filter_by(user_id=current_user.id).all()
+    return render_template('lists.html', title='My Lists', lists=user_lists)
 
 # View personal page of lists - flow of webpages: click list on this page > list's page with contents > click movie/series > movie/series page with details and reviews
 #@bp.route('/list/<int:list_id>')
@@ -355,3 +349,88 @@ def delete_movie(movie_id):
     db.session.commit()
     flash("Movie deleted from the database.", "info")
     return redirect(url_for('main.search'))
+
+# LISTS functionality
+# Adding movie to list
+@bp.route('/list/add-movie/<int:movie_id>', methods=['POST'])
+@login_required
+def add_to_list(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    list_id = request.form.get('list_id')
+    
+    if not list_id:
+        flash("Please select a list.", "warning")
+        return redirect(url_for('main.movie_detail', movie_id=movie_id))
+    
+    user_list = List.query.get_or_404(list_id)
+    
+    if user_list.user_id != current_user.id:
+        flash("You do not have permission to modify this list.", "danger")
+        return redirect(url_for('main.movie_detail', movie_id=movie_id))
+    
+    if movie in user_list.movies:
+        flash(f"'{movie.title}' is already in your list: {user_list.name}", "info")
+    else:
+        user_list.movies.append(movie)
+        db.session.commit()
+        flash(f"Added '{movie.title}' to {user_list.name}!", "success")
+        
+    return redirect(url_for('main.movie_detail', movie_id=movie_id))
+
+# Creating a list
+@bp.route('/list/create', methods=['POST'])
+@login_required
+def create_list():
+    name = request.form.get('name')
+    description = request.form.get('description')
+    public_status = True if request.form.get('public_status') == 'on' else False
+
+    if not name:
+        flash("List name is required!", "warning")
+        return redirect(url_for('main.lists'))
+
+    new_list = List(
+        name=name,
+        description=description,
+        public_status=public_status,
+        user_id=current_user.id
+    )
+
+    db.session.add(new_list)
+    db.session.commit()
+    
+    flash(f"List '{name}' created successfully!", "success")
+    return redirect(url_for('main.lists'))
+
+# Viewing a list
+@bp.route('/list/<int:list_id>')
+@login_required
+def view_list(list_id):
+    user_list = List.query.get_or_404(list_id)
+    
+    if not user_list.public_status and user_list.user_id != current_user.id:
+        flash("You do not have permission to view this private list.", "danger")
+        return redirect(url_for('main.lists'))
+        
+    return render_template('list_detail.html', title=user_list.name, user_list=user_list)
+
+# Removing movie from a list
+@bp.route('/list/<int:list_id>/remove-movie/<int:movie_id>', methods=['POST'])
+@login_required
+def remove_from_list(list_id, movie_id):
+    user_list = List.query.get_or_404(list_id)
+    
+    if user_list.user_id != current_user.id:
+        flash("You do not have permission to modify this list.", "danger")
+        return redirect(url_for('main.view_list', list_id=list_id))
+    
+    movie = Movie.query.get_or_404(movie_id)
+    
+    if movie in user_list.movies:
+        user_list.movies.remove(movie)
+        db.session.commit()
+        flash(f"'{movie.title}' removed from {user_list.name}.", "info")
+    else:
+        flash("Movie not found in this list.", "warning")
+        
+    return redirect(url_for('main.view_list', list_id=list_id))

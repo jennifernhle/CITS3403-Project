@@ -37,8 +37,11 @@
 <script>
   function deleteAccount(id) {
     if (confirm("Are you sure? This action cannot be undone.")) {
-      fetch(`/delete/${id}`, {
+      fetch(`/user/delete/${id}`, {
         method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token() }}",
+        },
       })
         .then((response) => {
           if (response.redirected) {
