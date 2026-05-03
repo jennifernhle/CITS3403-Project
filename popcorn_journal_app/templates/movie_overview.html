@@ -78,13 +78,17 @@
 
             <div class="mt-4 p-3 bg-light rounded border col-lg-8">
               <h6 class="fw-bold mb-3 small text-secondary">Add to Personal List</h6>
-              <form class="d-flex gap-2">
-                <select name="list_id" class="form-select form-select-sm" required>
-                  <option value="" selected disabled>Select a list...</option>
-                  <option value="1">My Favorites</option>
-                  <option value="2">Plan to Watch</option>
-                </select>
-                <button type="submit" class="btn btn-sm btn-success px-3">Add</button>
+              <form action="{{ url_for('main.add_to_list', movie_id=movie.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="input-group">
+                  <select name="list_id" class="form-select form-select-sm">
+                    <option value="">Choose a list...</option>
+                    {% for user_list in current_user.lists %}
+                    <option value="{{ user_list.id }}">{{ user_list.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-main btn-sm">Add</button>
+                </div>
               </form>
             </div>
           </div>

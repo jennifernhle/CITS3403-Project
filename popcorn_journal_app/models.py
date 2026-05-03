@@ -17,6 +17,12 @@ watchlist_items = db.Table('watchlist_items',
     db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True)
 )
 
+# Association table for lists of movies (many-to-many relationship)
+list_movies = db.Table('list_movies',
+    db.Column('list_id', db.Integer, db.ForeignKey('list.id'), primary_key=True),
+    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     # USER INFO
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +36,8 @@ class User(db.Model, UserMixin):
     profile_pic = db.Column(db.String(120), default='user.png')
     bio = db.Column(db.String(256), nullable=True)
     watchlist = db.relationship('Movie', secondary=watchlist_items, backref=db.backref('interested_users', lazy='dynamic'))
-    reviews = db.relationship('Review', backref='reviewer', lazy=True)
+    reviews = db.relationship('Review', backref='author', cascade='all, delete-orphan')
+    lists = db.relationship('List', backref='owner', cascade='all, delete-orphan')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -106,14 +113,12 @@ class Review(db.Model):
     date_posted = db.Column(db.DateTime, default=db.func.now())
     like_count = db.Column(db.Integer, default=0)
 
-    author = db.relationship('User', backref='my_reviews', lazy=True)
-
     def __repr__(self):
         return f'<Review {self.id} by {self.user_id}>'
     
 class List(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id')) # owner of the list
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # owner of the list
     name = db.Column(db.String(128)) # name of the list
     description = db.Column(db.Text) # description of the list
     public_status = db.Column(db.Boolean, default=False) # public or private list, default = private
@@ -121,6 +126,7 @@ class List(db.Model):
     content_type = db.Column(db.String(10))  # 'movie' or 'series' or 'mixed'
     content_ids = db.Column(db.String) # comma-separated list of movie/series IDs
     follower_count = db.Column(db.Integer, default=0) # number of followers for the list
+    movies = db.relationship('Movie', secondary='list_movies', backref='contained_in_lists')
     
     def __repr__(self):
         return f'<List {self.name} by User {self.user_id}>'

@@ -1,0 +1,62 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-5">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('main.lists') }}">My Lists</a></li>
+      <li class="breadcrumb-item active">{{ user_list.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="mb-4">
+    <h1 class="fw-bold">{{ user_list.name }}</h1>
+    <p class="text-secondary">{{ user_list.description or "No description provided." }}</p>
+  </div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for movie in user_list.movies %}
+    <div class="col">
+      <div class="card h-100 border-0 shadow-sm overflow-hidden">
+        {% if movie.movie_img %}
+        <img
+          src="{{ url_for('static', filename='posters/' + movie.movie_img) }}"
+          class="card-img-top"
+          alt="{{ movie.title }}"
+          style="height: 300px; object-fit: cover"
+        />
+        {% else %}
+        <img src="https://picsum.photos/400/600" class="card-img-top" alt="Placeholder" style="height: 300px; object-fit: cover" />
+        {% endif %}
+
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fw-bold text-truncate mb-1">{{ movie.title }}</h5>
+          <p class="text-muted small mb-3">{{ movie.release_year }} • Directed by {{ movie.director }}</p>
+
+          <div class="mt-auto">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('main.movie_detail', movie_id=movie.id) }}" class="btn btn-outline-main btn-sm">
+                <i class="bi bi-eye me-1"></i> View Details
+              </a>
+              <form
+                action="{{ url_for('main.remove_from_list', list_id=user_list.id, movie_id=movie.id) }}"
+                method="POST"
+                onsubmit="return confirm('Remove this movie from the list?');"
+              >
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-trash me-1"></i> Remove</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <div class="alert alert-light text-center border py-5">
+        <p class="mb-3">This list is currently empty.</p>
+        <a href="{{ url_for('main.search') }}" class="btn btn-main btn-sm">Find Movies to Add</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
