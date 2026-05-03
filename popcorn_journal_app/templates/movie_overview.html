@@ -1,0 +1,209 @@
+{% extends "base.html" %} {% block title %} {{ movie.title | default('Movie Detail') }} - Popcorn Journal {% endblock %} {% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+      <div class="card shadow-sm border-0 p-4 p-md-5 mb-5">
+        <div class="row g-4 align-items-start">
+          <div class="col-md-4">
+            {% if movie.movie_img %}
+            <img src="{{ url_for('static', filename='posters/' + movie.movie_img) }}" class="img-fluid rounded shadow-sm" alt="{{ movie.title }}" />
+            {% else %}
+            <img src="https://picsum.photos/400/600" class="img-fluid rounded shadow-sm" alt="No Poster" />
+            {% endif %}
+          </div>
+
+          <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h1 class="fw-bold mb-0" style="word-wrap: break-word">{{ movie.title }}</h1>
+              {% if current_user.is_authenticated and movie.creator_id == current_user.id %}
+              <div class="d-flex gap-2 ms-3">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm text-nowrap ms-3"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editMovieModal"
+                >
+                  <i class="bi bi-pencil me-1"></i>Edit Details
+                </button>
+                <form
+                  action="{{ url_for('main.delete_movie', movie_id=movie.id) }}"
+                  method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this movie?');"
+                  style="display: inline"
+                >
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <button type="submit" class="btn btn-outline-danger btn-sm text-nowrap"><i class="bi bi-trash me-1"></i>Delete</button>
+                </form>
+              </div>
+              {% endif %}
+            </div>
+            <p class="text-secondary fs-5 mb-3">
+              {{ movie.release_year }} • Directed by {{ movie.director }} {% if movie.genre %} •
+              <span class="badge bg-info text-dark">{{ movie.genre }}</span>{% endif %}
+            </p>
+
+            <div class="mb-3 d-flex gap-2 flex-wrap">
+              <span class="badge text-bg-secondary fs-6">Average Rating</span>
+              <span class="badge text-bg-light border fs-6">Featured Review</span>
+            </div>
+
+            <p class="text-secondary mb-4">
+              A short movie description or synopsis will appear here. This section introduces the selected movie and gives users a quick overview
+              before reading reviews.
+            </p>
+
+            <div class="d-flex gap-2 flex-wrap mt-3">
+              <button type="button" class="btn btn-main" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                <i class="bi bi-pencil-square me-2"></i>Write a Review
+              </button>
+              <button
+                class="btn btn-main add-btn"
+                data-movie-id="{{ movie.id }}"
+                {%
+                if
+                current_user.is_authenticated
+                and
+                movie
+                in
+                current_user.watchlist
+                %}
+                disabled
+                {%
+                endif
+                %}
+              >
+                {% if current_user.is_authenticated and movie in current_user.watchlist %} ✓ Added {% else %} + Watchlist {% endif %}
+              </button>
+            </div>
+
+            <div class="mt-4 p-3 bg-light rounded border col-lg-8">
+              <h6 class="fw-bold mb-3 small text-secondary">Add to Personal List</h6>
+              <form class="d-flex gap-2">
+                <select name="list_id" class="form-select form-select-sm" required>
+                  <option value="" selected disabled>Select a list...</option>
+                  <option value="1">My Favorites</option>
+                  <option value="2">Plan to Watch</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-success px-3">Add</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-5 opacity-25" />
+
+      <section class="mb-5">
+        <h2 class="fw-bold mb-3">User Reviews</h2>
+        <div class="row g-4">
+          {% for review in movie.reviews %}
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="mb-0 fw-bold">{{ review.author.username }}</h5>
+                  <span class="badge text-bg-secondary">{{ review.rating }}/10</span>
+                </div>
+                <p class="text-secondary mb-0">{{ review.content }}</p>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="col-12">
+            <p class="text-muted">No reviews yet. Be the first to write one!</p>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Review</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ url_for('main.add_review', movie_id=movie.id) }}" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Your Rating</label>
+            <select class="form-select" id="rating" name="rating" required>
+              <option value="" selected disabled>Select a score...</option>
+              <option value="10">10 - Masterpiece</option>
+              <option value="9">9 - Amazing</option>
+              <option value="8">8 - Great</option>
+              <option value="7">7 - Good</option>
+              <option value="6">6 - Fine</option>
+              <option value="5">5 - Average</option>
+              <option value="4">4 - Bad</option>
+              <option value="3">3 - Horrible</option>
+              <option value="2">2 - Painful</option>
+              <option value="1">1 - Unwatchable</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Your Thoughts</label>
+            <textarea name="content" class="form-control" rows="4" placeholder="What did you think about this movie?"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-link text-secondary text-decoration-none" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-main"><i class="bi bi-chat-left-dots me-1"></i>Post Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editMovieModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Update Movie Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ url_for('main.edit_movie', movie_id=movie.id) }}" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Title</label>
+              {{ form.title(class="form-control") }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Director</label>
+              {{ form.director(class="form-control") }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Release Year</label>
+              {{ form.release_year(class="form-control") }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Genre</label>
+              {{ form.genre(class="form-control") }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Movie Poster</label>
+            <div class="d-flex align-items-center gap-3">
+              <img src="{{ url_for('static', filename='posters/' + (movie.movie_img or 'default.jpg')) }}" width="60" class="rounded" />
+              {{ form.movie_img(class="form-control") }}
+            </div>
+            <small class="text-muted">Leave blank to keep current poster.</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-link text-secondary text-decoration-none" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

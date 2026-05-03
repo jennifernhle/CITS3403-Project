@@ -3,10 +3,11 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from popcorn_journal_app import db
-from popcorn_journal_app.models import User, Movie, Series, Review, List
+from popcorn_journal_app.models import User, Movie, Review, List
 import uuid
-from popcorn_journal_app.forms import RegistrationForm, LoginForm, EditProfileForm
+from popcorn_journal_app.forms import RegistrationForm, LoginForm, EditProfileForm, MovieForm
 import os
+from werkzeug.datastructures import FileStorage
 
 bp = Blueprint('main', __name__)
 
@@ -151,18 +152,39 @@ def register():
 def reset_password():
     return render_template('reset_password.html', title = 'Reset Password - Popcorn Journal')
 
-@bp.route('/review')
-def review():
-    return render_template('review.html', title = 'Reviews - Popcorn Journal')
 
 @bp.route('/search')
 def search():
-    return render_template('search.html', title = 'Search - Popcorn Journal')
+    query = request.args.get('query', '')
+    genre_filter = request.args.get('genre', '')
+    form = MovieForm()
+    results = Movie.query
+    if query:
+        results = results.filter(Movie.title.ilike(f'%{query}%') | Movie.director.ilike(f'%{query}%'))
+    if genre_filter:
+        results = results.filter(Movie.genre == genre_filter)
+    
+    return render_template('search.html', results=results.all(), title='Search Results', query=query, genre_filter=genre_filter, form=form)
 
 @bp.route('/watchlist')
 @login_required
 def watchlist():
-    return render_template('watchlist.html', title = 'Watchlist - Popcorn Journal')
+    movies = current_user.watchlist
+    return render_template('watchlist.html', title='My Watchlist', movies=movies)
+
+@bp.route('/watchlist/toggle/<int:movie_id>', methods=['POST'])
+@login_required
+def toggle_watchlist(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    if movie in current_user.watchlist:
+        current_user.watchlist.remove(movie)
+        action = 'removed'
+    else:
+        current_user.watchlist.append(movie)
+        action = 'added'
+    
+    db.session.commit()
+    return jsonify({'success': True, 'action': action})
 
 # Browse Lists page - shows all lists created by users, with option to click into each list to see the movies/series in that list
 @bp.route('/lists')
@@ -185,9 +207,9 @@ def logout():
 
 @bp.route('/movie/<int:movie_id>')
 def movie_detail(movie_id):
-    #movie = {'title': 'Inception', 'id': movie_id, 'release_year': '2010', 'rating': 8.8}
-    movie = Movie.query.get(movie_id)
-    return render_template('review.html', movie=movie.title, title=f"{movie.title} - Popcorn Journal")
+    movie = Movie.query.get_or_404(movie_id)
+    form = MovieForm(obj=movie)
+    return render_template('movie_overview.html', movie=movie, form=form, title=movie.title)
 
 
 @bp.route('/edit_profile', methods=['GET', 'POST'])
@@ -216,3 +238,120 @@ def edit_profile():
         form.last_name.data = current_user.last_name
         form.bio.data = current_user.bio
     return render_template('settings.html', title='Edit Profile', form=form)
+
+
+@bp.route('/add-movie', methods=['GET', 'POST'])
+@login_required
+def add_movie():
+    form = MovieForm()
+    if form.validate_on_submit():
+        existing_movie = Movie.query.filter(
+            Movie.title.ilike(form.title.data),
+            Movie.release_year == form.release_year.data
+        ).first()
+
+        if existing_movie:
+            flash(f'The movie "{form.title.data}" ({form.release_year.data}) already exists!', 'warning')
+            return render_template('add_movie.html', title='Add Movie', form=form)
+
+        file = form.movie_img.data
+        filename = None
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(current_app.root_path, 'static/posters', filename))
+
+        new_movie = Movie(
+            title=form.title.data,
+            director=form.director.data,
+            release_year=form.release_year.data,
+            genre=form.genre.data,
+            movie_img=filename,
+            creator_id=current_user.id
+        )
+        db.session.add(new_movie)
+        db.session.commit()
+        flash(f'Movie "{new_movie.title}" added to the database!', 'success')
+        return redirect(url_for('main.search'))
+    
+    return render_template('add_movie.html', title='Add Movie', form=form)
+
+@bp.route('/movie/<int:movie_id>/review', methods=['POST'])
+@login_required
+def add_review(movie_id):
+    rating = request.form.get('rating')
+    content = request.form.get('content')
+
+    if not rating:
+        flash('Please select a rating.')
+        return redirect(url_for('main.movie_detail', movie_id=movie_id))
+
+    new_review = Review(
+        rating=int(rating),
+        content=content,
+        movie_id=movie_id,
+        user_id=current_user.id
+    )
+
+    db.session.add(new_review)
+    db.session.commit()
+
+    flash('Your review has been posted!')
+    return redirect(url_for('main.movie_detail', movie_id=movie_id))
+
+@bp.route('/movie/<int:movie_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    
+    if movie.creator_id != current_user.id:
+        flash("You do not have permission to edit this movie.", "danger")
+        return redirect(url_for('main.movie_detail', movie_id=movie.id))
+    
+    form = MovieForm(obj=movie)
+    
+    if form.validate_on_submit():
+        existing_movie = Movie.query.filter(
+            Movie.title.ilike(form.title.data),
+            Movie.release_year == form.release_year.data,
+            Movie.id != movie.id
+        ).first()
+
+        if existing_movie:
+            flash("A movie with this title and year already exists!", "warning")
+            return redirect(url_for('main.movie_detail', movie_id=movie.id))
+        
+        movie.title = form.title.data
+        movie.director = form.director.data
+        movie.release_year = form.release_year.data
+        movie.genre = form.genre.data
+
+        if isinstance(form.movie_img.data, FileStorage) and form.movie_img.data.filename != '':
+            file = form.movie_img.data
+            filename = secure_filename(file.filename)
+            upload_path = os.path.join(current_app.root_path, 'static/posters')
+            
+            if not os.path.exists(upload_path):
+                os.makedirs(upload_path)
+                
+            file.save(os.path.join(upload_path, filename))
+            movie.movie_img = filename
+
+        db.session.commit()
+        flash("Movie details updated!", "success")
+        return redirect(url_for('main.movie_detail', movie_id=movie.id))
+    
+    return render_template('add_movie.html', title='Edit Movie', form=form, movie=movie)
+
+@bp.route('/movie/<int:movie_id>/delete', methods=['POST'])
+@login_required
+def delete_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    
+    if movie.creator_id != current_user.id:
+        flash("You do not have permission to delete this entry.", "danger")
+        return redirect(url_for('main.movie_detail', movie_id=movie.id))
+
+    db.session.delete(movie)
+    db.session.commit()
+    flash("Movie deleted from the database.", "info")
+    return redirect(url_for('main.search'))
