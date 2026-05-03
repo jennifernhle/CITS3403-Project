@@ -2,7 +2,7 @@
 
 <div class="container py-5">
   <h1 class="fw-bold mb-4">User Settings</h1>
-  <p class="text-secondary mb-4">Manage your account details, preferences, and privacy settings.</p>
+  <p class="text-secondary mb-4">Manage your account details.</p>
 
   <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
@@ -25,37 +25,29 @@
 
         <div class="mb-3">
           {{ form.profile_pic.label(class="form-label") }} {{ form.profile_pic(class="form-control") }}
-          <div class="form-text">Currently: {{ current_user.profile_pic or 'user.png' }}</div>
+          <div class="d-flex align-items-center mt-2">
+            <span class="text-secondary small me-2">Current:</span>
+            <img
+              src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_pic or 'user.png')) }}"
+              class="rounded-circle border"
+              style="width: 40px; height: 40px; object-fit: cover"
+            />
+          </div>
         </div>
         {{ form.submit(class="btn btn-main") }}
       </form>
     </div>
-    <button class="btn danger-btn mt-3" onclick="deleteAccount('{{ current_user.id }}')">Delete Account</button>
+  </div>
+  <div class="card border-danger shadow-sm mb-4">
+    <div class="card-body p-4">
+      <h5 class="text-danger fw-bold mb-2">Danger Zone</h5>
+      <p class="text-secondary small">Once you delete your account, there is no going back. Please be certain.</p>
+      <button class="btn btn-outline-danger" id="delete-account-btn" data-user-id="{{ current_user.id }}" data-csrf="{{ csrf_token() }}">
+        Delete Account
+      </button>
+    </div>
   </div>
 </div>
-
-<script>
-  function deleteAccount(id) {
-    if (confirm("Are you sure? This action cannot be undone.")) {
-      fetch(`/user/delete/${id}`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": "{{ csrf_token() }}",
-        },
-      })
-        .then((response) => {
-          if (response.redirected) {
-            window.location.href = response.url;
-          } else {
-            window.location.reload();
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          alert("An error occurred while deleting the account.");
-        });
-    }
-  }
-</script>
-
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 {% endblock%}
