@@ -1,16 +1,97 @@
 {% extends "base.html" %} {% block content %}
 <div class="container mt-5">
-  <h1>Welcome back, {{ current_user.username }}!</h1>
-  <p>This is your personalised dashboard.</p>
+  <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+    <h1 class="display-5 fw-bold">Welcome back, {{ current_user.username }}!</h1>
+    <p class="col-md-8 fs-4">Your cinematic journey continues here. Explore what the community is watching.</p>
+    <hr class="my-4" />
 
-  <div class="row mt-4">
-    <div class="col-md-4">
-      <div class="card p-3">
-        <h5>Your Stats</h5>
-        <p>Movies logged: {{ current_user.logged_movie_count }}</p>
-        <p>Followers: {{ current_user.follower_count }}</p>
+    <div class="row g-4 py-2">
+      <div class="col-md-4">
+        <h6><strong>Add movies to a user-built database</strong></h6>
+        <p class="small text-muted">Add and contribute to our global database and share your rating.</p>
+      </div>
+      <div class="col-md-4">
+        <h6><strong>Build lists</strong></h6>
+        <p class="small text-muted">Organise your favourites into public or private collections.</p>
+      </div>
+      <div class="col-md-4">
+        <h6><strong>Connect with others</strong></h6>
+        <p class="small text-muted">Follow other users to see their reviews in your feed.</p>
       </div>
     </div>
   </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <h4 class="mb-3 border-bottom pb-2">Recent Reviews</h4>
+      {% for review in recent_reviews %}
+      <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ review.movie.title }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Reviewed by {{ review.author.username }}</h6>
+          <p class="card-text">"{{ review.content[:150] }}"</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <span
+              class="badge {% if review.rating >= 9 %} bg-success {% elif review.rating >= 7 %} bg-info text-dark {% elif review.rating >= 5 %} bg-warning text-dark {% else %} bg-danger {% endif %}"
+            >
+              {{ review.rating | int }}/10
+            </span>
+            <button
+              class="btn btn-sm {% if current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
+              data-review-id="{{ review.id }}"
+            >
+              <i class="bi bi-heart{% if current_user in review.likes %}-fill{% endif %}"></i>
+              <span class="like-count">{{ review.likes.count() }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card p-3 mb-4 border-primary">
+        <h5 class="fw-bold">Your Impact</h5>
+        <ul class="list-unstyled">
+          <li>🎬 <strong>{{ current_user.logged_movie_count }}</strong> Movies Logged</li>
+          <li>👥 <strong>{{ current_user.followers.count() }}</strong> Followers</li>
+          <li>📜 <strong>{{ current_user.lists.count() }}</strong> Personal Lists</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-12">
+      <h4 class="mb-4 border-bottom pb-2">Featured Community Lists</h4>
+    </div>
+    {% for user_list in public_lists %}
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="fw-bold mb-0 text-truncate" style="max-width: 70%">{{ user_list.name }}</h5>
+            <span class="badge bg-secondary">{{ user_list.movies|length }} movies</span>
+          </div>
+          <p class="text-secondary small mb-3 flex-grow-1">
+            {{ user_list.description[:80] }}{% if user_list.description|length > 80 %}...{% endif %}
+          </p>
+          <div class="mt-auto">
+            <h6 class="small fw-bold text-muted mb-2">Sneak Peek:</h6>
+            <ul class="list-unstyled mb-3">
+              {% for movie in user_list.movies[:3] %}
+              <li class="small text-truncate"><i class="bi bi-film me-2 text-primary"></i>{{ movie.title }}</li>
+              {% endfor %}
+            </ul>
+            <a href="{{ url_for('main.view_list', list_id=user_list.id) }}" class="btn btn-outline-primary btn-sm w-100">View Full List</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12"><p class="text-muted text-center">No public lists to feature yet.</p></div>
+    {% endfor %}
+  </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/like.js') }}"></script>
 {% endblock %}

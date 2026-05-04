@@ -1,15 +1,18 @@
 {% extends "base.html" %} {% block content %}
 <div class="container py-5">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('main.lists') }}">My Lists</a></li>
-      <li class="breadcrumb-item active">{{ user_list.name }}</li>
-    </ol>
-  </nav>
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="fw-bold">{{ user_list.name }}</h1>
+      <p class="text-secondary">Curated by {{ user_list.owner.username }}</p>
+      <p>{{ user_list.description }}</p>
+    </div>
 
-  <div class="mb-4">
-    <h1 class="fw-bold">{{ user_list.name }}</h1>
-    <p class="text-secondary">{{ user_list.description or "No description provided." }}</p>
+    <!-- ONLY show Edit button if current user is the owner -->
+    {% if user_list.user_id == current_user.id %}
+    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editListModal">
+      <i class="bi bi-pencil me-2"></i>Edit List
+    </button>
+    {% endif %}
   </div>
 
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
@@ -33,9 +36,10 @@
 
           <div class="mt-auto">
             <div class="d-grid gap-2">
-              <a href="{{ url_for('main.movie_detail', movie_id=movie.id) }}" class="btn btn-outline-main btn-sm">
+              <a href="{{ url_for('main.movie_detail', movie_id=movie.id) }}" class="btn btn-main btn-sm">
                 <i class="bi bi-eye me-1"></i> View Details
               </a>
+              {% if user_list.user_id == current_user.id %}
               <form
                 action="{{ url_for('main.remove_from_list', list_id=user_list.id, movie_id=movie.id) }}"
                 method="POST"
@@ -44,6 +48,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-trash me-1"></i> Remove</button>
               </form>
+              {% endif %}
             </div>
           </div>
         </div>

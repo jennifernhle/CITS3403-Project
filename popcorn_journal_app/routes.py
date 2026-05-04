@@ -265,6 +265,7 @@ def add_movie():
             director=form.director.data,
             release_year=form.release_year.data,
             genre=form.genre.data,
+            synopsis=request.form.get('synopsis'),
             movie_img=filename,
             creator_id=current_user.id
         )
@@ -303,27 +304,14 @@ def add_review(movie_id):
 def edit_movie(movie_id):
     movie = Movie.query.get_or_404(movie_id)
     
-    if movie.creator_id != current_user.id:
-        flash("You do not have permission to edit this movie.", "danger")
-        return redirect(url_for('main.movie_detail', movie_id=movie.id))
-    
     form = MovieForm(obj=movie)
     
-    if form.validate_on_submit():
-        existing_movie = Movie.query.filter(
-            Movie.title.ilike(form.title.data),
-            Movie.release_year == form.release_year.data,
-            Movie.id != movie.id
-        ).first()
-
-        if existing_movie:
-            flash("A movie with this title and year already exists!", "warning")
-            return redirect(url_for('main.movie_detail', movie_id=movie.id))
-        
+    if form.validate_on_submit():        
         movie.title = form.title.data
         movie.director = form.director.data
         movie.release_year = form.release_year.data
         movie.genre = form.genre.data
+        movie.synopsis = request.form.get('synopsis')
 
         if isinstance(form.movie_img.data, FileStorage) and form.movie_img.data.filename != '':
             file = form.movie_img.data
@@ -469,7 +457,7 @@ def edit_list(list_id):
     user_list = List.query.get_or_404(list_id)
     
     if user_list.user_id != current_user.id:
-        flash("You do not have permission to edit this list.")
+        flash("You do not have permission to edit this list.", "danger")
         return redirect(url_for('main.lists'))
     
     user_list.name = request.form.get('name')
@@ -477,4 +465,5 @@ def edit_list(list_id):
     user_list.public_status = True if request.form.get('public_status') == 'on' else False
     
     db.session.commit()
+    flash("List updated successfully!", "success")
     return redirect(url_for('main.view_list', list_id=user_list.id))

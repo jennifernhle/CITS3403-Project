@@ -15,7 +15,7 @@
           <div class="col-md-8">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h1 class="fw-bold mb-0" style="word-wrap: break-word">{{ movie.title }}</h1>
-              {% if current_user.is_authenticated and movie.creator_id == current_user.id %}
+              {% if current_user.is_authenticated %}
               <div class="d-flex gap-2 ms-3">
                 <button
                   type="button"
@@ -43,14 +43,15 @@
             </p>
 
             <div class="mb-3 d-flex gap-2 flex-wrap">
-              <span class="badge text-bg-secondary fs-6">Average Rating</span>
-              <span class="badge text-bg-light border fs-6">Featured Review</span>
+              {% set avg_rating = movie.get_average_rating() %}
+              <span
+                class="badge fs-6 {% if avg_rating >= 8 %} bg-success {% elif avg_rating >= 6 %} bg-info text-dark {% else %} bg-secondary {% endif %}"
+              >
+                Average rating: {{ avg_rating | round(1) if avg_rating > 0 else 'No reviews yet' }}
+              </span>
             </div>
 
-            <p class="text-secondary mb-4">
-              A short movie description or synopsis will appear here. This section introduces the selected movie and gives users a quick overview
-              before reading reviews.
-            </p>
+            <p class="text-secondary mb-4">{{ movie.synopsis or "No synopsis available for this movie." }}</p>
 
             <div class="d-flex gap-2 flex-wrap mt-3">
               <button type="button" class="btn btn-main" data-bs-toggle="modal" data-bs-target="#reviewModal">
@@ -111,7 +112,11 @@
                   <h5 class="mb-0 fw-bold">{{ review.author.username }}</h5>
 
                   <div class="d-flex align-items-center gap-2">
-                    <span class="badge text-bg-secondary">{{ review.rating }}/10</span>
+                    <span
+                      class="badge {% if review.rating >= 9 %} bg-success {% elif review.rating >= 7 %} bg-info text-dark {% elif review.rating >= 5 %} bg-warning text-dark {% else %} bg-danger {% endif %}"
+                    >
+                      {{ review.rating | int }}/10
+                    </span>
 
                     <button
                       class="btn btn-sm {% if current_user.is_authenticated and current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
@@ -207,6 +212,12 @@
               {{ form.genre(class="form-control") }}
             </div>
           </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Synopsis</label>
+            <textarea name="synopsis" class="form-control" rows="4">{{ movie.synopsis or '' }}</textarea>
+          </div>
+
           <div class="mb-3">
             <label class="form-label fw-bold">Movie Poster</label>
             <div class="d-flex align-items-center gap-3">

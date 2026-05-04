@@ -154,7 +154,9 @@ body {
   background-color: var(--card-bg);
   color: var(--accent-red);
   border-radius: 12px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   height: 100%;
   border: 0.5px solid var(--accent-grey);
 }
@@ -185,4 +187,21 @@ body {
 .invalid::before {
   content: "✖";
   margin-right: 8px;
+}
+
+.nav-tabs .nav-link {
+  color: var(--accent-grey);
+  transition: all 0.3s ease;
+  border-radius: 8px 8px 0 0;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--accent-red) !important;
+  background-color: transparent !important;
+  border-bottom: 3px solid var(--accent-red) !important;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  color: var(--accent-yellow) !important;
+  border-bottom: 3px solid var(--accent-yellow-muted);
 }

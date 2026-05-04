@@ -91,9 +91,15 @@ class Movie(db.Model):
     director = db.Column(db.String(64))
     release_year = db.Column(db.Integer)
     genre = db.Column(db.String(64))
+    synopsis = db.Column(db.Text, nullable=True)
     movie_img = db.Column(db.String(256), nullable=True) # URL or file path to movie cover image
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     reviews = db.relationship('Review', backref='movie', lazy=True)
+    def get_average_rating(self):
+        if not self.reviews:
+            return 0
+        total = sum(review.rating for review in self.reviews)
+        return total / len(self.reviews)
 
     def __repr__(self):
         return f'<Movie {self.title}>'

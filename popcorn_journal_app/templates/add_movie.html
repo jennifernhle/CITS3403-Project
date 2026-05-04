@@ -26,11 +26,18 @@
       </div>
 
       <div class="mb-3">
+        <label class="form-label fw-bold">Synopsis</label>
+        <textarea name="synopsis" class="form-control" rows="4" placeholder="Brief summary of the movie...">
+{{ movie.synopsis if movie else '' }}</textarea
+        >
+      </div>
+
+      <div class="mb-3">
         <label class="form-label">Movie Poster</label>
         <input type="file" name="movie_img" class="form-control" accept="image/*" />
       </div>
 
-      <button type="submit" class="btn btn-main w-100">Add to Database</button>
+      <button type="submit" class="btn btn-main w-100">{% if 'Edit' in title %}Update Movie{% else %}Add to Database{% endif %}</button>
     </form>
   </div>
 </div>

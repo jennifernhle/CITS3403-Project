@@ -2,48 +2,96 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="fw-bold" id="title">My Lists</h1>
-      <p class="text-secondary mb-0">Organise and manage your cinematic collections.</p>
+      <h1 class="fw-bold" id="title">Lists</h1>
+      <p class="text-secondary mb-0">Browse your collections or see what the community is watching.</p>
     </div>
     <button type="button" class="btn btn-main" data-bs-toggle="modal" data-bs-target="#createListModal">
       <i class="bi bi-plus-lg me-2"></i> Create New List
     </button>
   </div>
 
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    {% for list in lists %}
-    <div class="col">
-      <div class="card h-100 shadow-sm border-0">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="card-title fw-bold mb-0">{{ list.name }}</h5>
-            <span class="badge bg-light text-dark border"> {{ 'Public' if list.public_status else 'Private' }} </span>
-          </div>
-          <p class="card-text text-secondary small mb-4">{{ list.description or "No description provided." }}</p>
+  <ul class="nav nav-tabs mb-4 border-0" id="listTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-bold border-0" id="my-lists-tab" data-bs-toggle="tab" data-bs-target="#my-lists" type="button" role="tab">
+        My Lists
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold border-0" id="community-tab" data-bs-toggle="tab" data-bs-target="#community-lists" type="button" role="tab">
+        Community
+      </button>
+    </li>
+  </ul>
 
-          <div class="mt-auto">
-            <p class="text-secondary small mb-3"><i class="bi bi-collection-play me-1"></i> {{ list.movies|length }} movies</p>
-            <div class="d-grid gap-2">
-              <a href="{{ url_for('main.view_list', list_id=list.id) }}" class="btn btn-outline-secondary btn-sm">View List</a>
-              <form
-                action="{{ url_for('main.delete_list', list_id=list.id) }}"
-                method="POST"
-                onsubmit="return confirm('Are you sure you want to delete this list?');"
-              >
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-trash me-1"></i> Delete List</button>
-              </form>
+  <div class="tab-content" id="listTabContent">
+    <!-- Personal tab -->
+    <div class="tab-pane fade show active" id="my-lists" role="tabpanel">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for list in my_lists %}
+        <div class="col">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body p-4 d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title fw-bold mb-0">{{ list.name }}</h5>
+                <span class="badge bg-light text-dark border"> {{ 'Public' if list.public_status else 'Private' }} </span>
+              </div>
+              <p class="card-text text-secondary small mb-4">{{ list.description or "No description provided." }}</p>
+
+              <div class="mt-auto">
+                <p class="text-secondary small mb-3"><i class="bi bi-collection-play me-1"></i> {{ list.movies|length }} movies</p>
+                <div class="d-grid gap-2">
+                  <a href="{{ url_for('main.view_list', list_id=list.id) }}" class="btn btn-main btn-sm w-100">View List</a>
+                  {% if list.user_id == current_user.id %}
+                  <form
+                    action="{{ url_for('main.delete_list', list_id=list.id) }}"
+                    method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete this list?');"
+                  >
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-trash me-1"></i> Delete List</button>
+                  </form>
+                  {% endif %}
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+          <p class="text-muted">You haven't created any lists yet.</p>
+        </div>
+        {% endfor %}
       </div>
     </div>
-    {% else %}
-    <div class="col-12 text-center py-5">
-      <p class="text-muted">You haven't created any lists yet. Click the button above to start creating custom lists.</p>
+
+    <!-- Community tab -->
+    <div class="tab-pane fade" id="community-lists" role="tabpanel">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for list in public_lists %}
+        <div class="col">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body p-4 d-flex flex-column">
+              <h5 class="card-title fw-bold">{{ list.name }}</h5>
+              <p class="text-muted small">Curated by: {{ list.owner.username }}</p>
+              <p class="card-text text-secondary small mb-4">
+                {{ list.description[:100] }}{{ "..." if list.description and list.description|length > 100 }}
+              </p>
+              <div class="mt-auto">
+                <p class="text-secondary small mb-3"><i class="bi bi-collection-play me-1"></i> {{ list.movies|length }} movies</p>
+                <a href="{{ url_for('main.view_list', list_id=list.id) }}" class="btn btn-main btn-sm w-100">View List</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+          <p class="text-muted">No public lists found in the community.</p>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    {% endfor %}
   </div>
+
   <div class="modal fade" id="createListModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow">
