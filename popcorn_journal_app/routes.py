@@ -14,7 +14,12 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 def index():
     if current_user.is_authenticated:
-        return render_template('home.html', title='Home')
+        # 5 most recent reviews shown globally for feed
+        recent = Review.query.order_by(Review.date_posted.desc()).limit(5).all()
+        # 4 public lists to showcase
+        public = List.query.filter_by(public_status=True).limit(4).all()
+            
+        return render_template('home.html', title='Home', recent_reviews=recent, public_lists=public)
     return render_template('index.html', title='Welcome')
 
 @bp.route('/about-us')
@@ -186,8 +191,9 @@ def toggle_watchlist(movie_id):
 # Browse Lists page - shows all lists created by users, with option to click into each list to see the movies/series in that list
 @bp.route('/lists')
 def lists():
-    user_lists = List.query.filter_by(user_id=current_user.id).all()
-    return render_template('lists.html', title='My Lists', lists=user_lists)
+    my_lists = List.query.filter_by(user_id=current_user.id).all()
+    public_lists = List.query.filter(List.public_status == True, List.user_id != current_user.id).all()
+    return render_template('lists.html', title='Lists', my_lists=my_lists, public_lists=public_lists)
 
 # View personal page of lists - flow of webpages: click list on this page > list's page with contents > click movie/series > movie/series page with details and reviews
 #@bp.route('/list/<int:list_id>')
@@ -434,3 +440,41 @@ def remove_from_list(list_id, movie_id):
         flash("Movie not found in this list.", "warning")
         
     return redirect(url_for('main.view_list', list_id=list_id))
+
+# Liking a review
+@bp.route('/like-review/<int:review_id>', methods=['POST'])
+@login_required
+def like_review(review_id):
+    review = Review.query.get_or_404(review_id)
+    
+    if current_user in review.likes:
+        review.likes.remove(current_user)
+        action = 'unliked'
+    else:
+        review.likes.append(current_user)
+        action = 'liked'
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'action': action,
+        'count': review.likes.count()
+    })
+
+# Editing lists
+@bp.route('/edit-list/<int:list_id>', methods=['POST'])
+@login_required
+def edit_list(list_id):
+    user_list = List.query.get_or_404(list_id)
+    
+    if user_list.user_id != current_user.id:
+        flash("You do not have permission to edit this list.")
+        return redirect(url_for('main.lists'))
+    
+    user_list.name = request.form.get('name')
+    user_list.description = request.form.get('description')
+    user_list.public_status = True if request.form.get('public_status') == 'on' else False
+    
+    db.session.commit()
+    return redirect(url_for('main.view_list', list_id=user_list.id))

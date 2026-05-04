@@ -82,10 +82,13 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <div class="input-group">
                   <select name="list_id" class="form-select form-select-sm">
+                    {% if current_user.lists %}
                     <option value="">Choose a list...</option>
                     {% for user_list in current_user.lists %}
                     <option value="{{ user_list.id }}">{{ user_list.name }}</option>
-                    {% endfor %}
+                    {% endfor %} {% else %}
+                    <option value="">No lists created yet</option>
+                    {% endif %}
                   </select>
                   <button type="submit" class="btn btn-main btn-sm">Add</button>
                 </div>
@@ -106,7 +109,18 @@
               <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <h5 class="mb-0 fw-bold">{{ review.author.username }}</h5>
-                  <span class="badge text-bg-secondary">{{ review.rating }}/10</span>
+
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge text-bg-secondary">{{ review.rating }}/10</span>
+
+                    <button
+                      class="btn btn-sm {% if current_user.is_authenticated and current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
+                      data-review-id="{{ review.id }}"
+                    >
+                      <i class="bi bi-heart{% if current_user.is_authenticated and current_user in review.likes %}-fill{% endif %}"></i>
+                      {{ review.likes.count() }}
+                    </button>
+                  </div>
                 </div>
                 <p class="text-secondary mb-0">{{ review.content }}</p>
               </div>
@@ -210,4 +224,6 @@
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/like.js') }}"></script>
 {% endblock %}

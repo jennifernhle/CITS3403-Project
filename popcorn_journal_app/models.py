@@ -23,6 +23,12 @@ list_movies = db.Table('list_movies',
     db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True)
 )
 
+# Association table for review likes
+review_likes = db.Table('review_likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('review_id', db.Integer, db.ForeignKey('review.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     # USER INFO
     id = db.Column(db.Integer, primary_key=True)
@@ -36,8 +42,9 @@ class User(db.Model, UserMixin):
     profile_pic = db.Column(db.String(120), default='user.png')
     bio = db.Column(db.String(256), nullable=True)
     watchlist = db.relationship('Movie', secondary=watchlist_items, backref=db.backref('interested_users', lazy='dynamic'))
-    reviews = db.relationship('Review', backref='author', cascade='all, delete-orphan')
-    lists = db.relationship('List', backref='owner', cascade='all, delete-orphan')
+    reviews = db.relationship('Review', backref='author', lazy='dynamic', cascade='all, delete-orphan')
+    liked_reviews = db.relationship('Review', secondary=review_likes, backref=db.backref('likes', lazy='dynamic'), lazy='dynamic')
+    lists = db.relationship('List', backref='owner', lazy='dynamic', cascade='all, delete-orphan')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -54,11 +61,10 @@ class User(db.Model, UserMixin):
     # STATISTICS
     # Note: Will need to determine the best way to calculate these counts,
     # such as http GET actual values from database and then get length of each list.
-    follower_count = db.Column(db.Integer, default=0) # number of followers for the user
-    review_count = db.Column(db.Integer, default=0) # number of reviews written by the user
-    list_count = db.Column(db.Integer, default=0) # number of lists created by the user
-    logged_movie_count = db.Column(db.Integer, default=0) # number of movies watched by the user AGAIN, will need to change this so it is calculated from the length of the list in the database.
-    logged_series_count = db.Column(db.Integer, default=0) # number of series watched by the user, same as above.
+    # follower_count = db.Column(db.Integer, default=0) # number of followers for the user
+    # review_count = db.Column(db.Integer, default=0) # number of reviews written by the user
+    # list_count = db.Column(db.Integer, default=0) # number of lists created by the user
+    # logged_movie_count = db.Column(db.Integer, default=0) # number of movies watched by the user AGAIN, will need to change this so it is calculated from the length of the list in the database.
 
     def follow(self, user):
         """Follow a user"""
