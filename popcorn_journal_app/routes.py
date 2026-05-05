@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request, current_app
 from flask_login import login_user, login_required, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from popcorn_journal_app import db
 from popcorn_journal_app.models import User, Movie, Review, List
 import uuid
-from popcorn_journal_app.forms import RegistrationForm, LoginForm, EditProfileForm, MovieForm
+from popcorn_journal_app.forms import RegistrationForm, LoginForm, EditProfileForm, MovieForm, ReviewForm
 import os
 from werkzeug.datastructures import FileStorage
 
@@ -17,8 +16,7 @@ def index():
         # 5 most recent reviews shown globally for feed
         recent = Review.query.order_by(Review.date_posted.desc()).limit(5).all()
         # 4 public lists to showcase
-        public = List.query.filter_by(public_status=True).limit(4).all()
-            
+        public = List.query.filter_by(public_status=True).order_by(List.id.desc()).limit(4).all()    
         return render_template('home.html', title='Home', recent_reviews=recent, public_lists=public)
     return render_template('index.html', title='Welcome')
 
@@ -134,14 +132,12 @@ def register():
         if User.query.filter_by(email=form.email.data).first():
             flash('Email already exists.')
             return render_template('register.html', form=form)
-
-        hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
-        
+                
         new_user = User(
             username=form.username.data,
-            email=form.email.data,
-            password_hash=hashed_password
+            email=form.email.data
         )
+        new_user.set_password(form.password.data)
 
         db.session.add(new_user)
         db.session.commit()
@@ -191,8 +187,8 @@ def toggle_watchlist(movie_id):
 # Browse Lists page - shows all lists created by users, with option to click into each list to see the movies/series in that list
 @bp.route('/lists')
 def lists():
-    my_lists = List.query.filter_by(user_id=current_user.id).all()
-    public_lists = List.query.filter(List.public_status == True, List.user_id != current_user.id).all()
+    my_lists = List.query.filter_by(user_id=current_user.id).order_by(List.id.desc()).all()
+    public_lists = List.query.filter(List.public_status == True, List.user_id != current_user.id).order_by(List.id.desc()).all()
     return render_template('lists.html', title='Lists', my_lists=my_lists, public_lists=public_lists)
 
 # View personal page of lists - flow of webpages: click list on this page > list's page with contents > click movie/series > movie/series page with details and reviews
@@ -208,9 +204,16 @@ def logout():
 @bp.route('/movie/<int:movie_id>')
 def movie_detail(movie_id):
     movie = Movie.query.get_or_404(movie_id)
-    form = MovieForm(obj=movie)
-    return render_template('movie_overview.html', movie=movie, form=form, title=movie.title)
+    review_form = ReviewForm()
+    movie_form = MovieForm(obj=movie)
+    user_review = None
 
+    if current_user.is_authenticated:
+        user_review = Review.query.filter_by(movie_id=movie_id, user_id=current_user.id).first()
+        if user_review:
+            review_form.rating.data = str(user_review.rating)
+            review_form.content.data = user_review.content
+    return render_template('movie_overview.html', movie=movie, review_form=review_form, movie_form=movie_form, user_review=user_review)
 
 @bp.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -279,24 +282,25 @@ def add_movie():
 @bp.route('/movie/<int:movie_id>/review', methods=['POST'])
 @login_required
 def add_review(movie_id):
-    rating = request.form.get('rating')
-    content = request.form.get('content')
+    form = ReviewForm()
+    if form.validate_on_submit():
+        existing_review = Review.query.filter_by(movie_id=movie_id, user_id=current_user.id).first()
+        rating_val = int(form.rating.data)
+        content_val = form.content.data
 
-    if not rating:
-        flash('Please select a rating.')
-        return redirect(url_for('main.movie_detail', movie_id=movie_id))
-
-    new_review = Review(
-        rating=int(rating),
-        content=content,
-        movie_id=movie_id,
-        user_id=current_user.id
-    )
-
-    db.session.add(new_review)
-    db.session.commit()
-
-    flash('Your review has been posted!')
+        if existing_review:
+            existing_review.rating = rating_val
+            existing_review.content = content_val
+            flash('Review updated!', 'success')
+        else:
+            new_review = Review( rating=rating_val, content=content_val, movie_id=movie_id, user_id=current_user.id )
+            db.session.add(new_review)
+            flash('Review posted!', 'success')
+        db.session.commit()
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Error in {field}: {error}", 'danger')
     return redirect(url_for('main.movie_detail', movie_id=movie_id))
 
 @bp.route('/movie/<int:movie_id>/edit', methods=['GET', 'POST'])
@@ -378,10 +382,13 @@ def create_list():
     name = request.form.get('name')
     description = request.form.get('description')
     public_status = True if request.form.get('public_status') == 'on' else False
+    movie_id = request.form.get('movie_id')
+
+    next_page = request.args.get('next')
 
     if not name:
         flash("List name is required!", "warning")
-        return redirect(url_for('main.lists'))
+        return redirect(next_page or url_for('main.lists'))
 
     new_list = List(
         name=name,
@@ -390,11 +397,16 @@ def create_list():
         user_id=current_user.id
     )
 
+    if movie_id:
+        movie = Movie.query.get(movie_id)
+        if movie:
+            new_list.movies.append(movie)
+
     db.session.add(new_list)
     db.session.commit()
     
     flash(f"List '{name}' created successfully!", "success")
-    return redirect(url_for('main.lists'))
+    return redirect(next_page or url_for('main.lists'))
 
 # Viewing a list
 @bp.route('/list/<int:list_id>')
@@ -467,3 +479,18 @@ def edit_list(list_id):
     db.session.commit()
     flash("List updated successfully!", "success")
     return redirect(url_for('main.view_list', list_id=user_list.id))
+
+@bp.route('/review/delete/<int:review_id>', methods=['POST'])
+@login_required
+def delete_review(review_id):
+    review = Review.query.get_or_404(review_id)
+    movie_id = review.movie_id
+    
+    if review.user_id != current_user.id:
+        flash("You can only delete your own reviews.", "danger")
+        return redirect(url_for('main.movie_detail', movie_id=movie_id))
+    
+    db.session.delete(review)
+    db.session.commit()
+    flash("Review removed.", "success")
+    return redirect(url_for('main.movie_detail', movie_id=movie_id))
