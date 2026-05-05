@@ -205,3 +205,52 @@ body {
   color: var(--accent-yellow) !important;
   border-bottom: 3px solid var(--accent-yellow-muted);
 }
+
+.heart-btn i {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.heart-btn:focus {
+  box-shadow: none;
+}
+
+.like-container {
+  padding-left: 2px;
+}
+
+.popcorn-empty {
+  filter: grayscale(100%);
+  opacity: 0.3;
+  display: inline-block;
+}
+
+.popcorn-full {
+  display: inline-block;
+  filter: drop-shadow(0 0 2px rgba(229, 166, 87, 0.4));
+}
+
+.expandable-content {
+  max-height: 4.5em; /* 3 lines */
+  overflow: hidden;
+  position: relative;
+  transition: max-height 0.3s ease-out;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.expandable-content.collapsed.is-long::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1.5em;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 1));
+  pointer-events: none;
+}
+
+.expandable-content.expanded {
+  max-height: 2000px;
+}
