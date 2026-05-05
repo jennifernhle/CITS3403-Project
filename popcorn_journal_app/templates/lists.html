@@ -35,22 +35,22 @@
                 <h5 class="card-title fw-bold mb-0">{{ list.name }}</h5>
                 <span class="badge bg-light text-dark border"> {{ 'Public' if list.public_status else 'Private' }} </span>
               </div>
-              <p class="card-text text-secondary small mb-4">{{ list.description or "No description provided." }}</p>
+
+              <div
+                id="list-desc-{{ list.id }}"
+                class="expandable-content collapsed {% if list.description and list.description|length > 100 %}is-long{% endif %}"
+              >
+                <p class="card-text text-secondary small mb-3">{{ list.description or "No description provided." }}</p>
+              </div>
+
+              {% if list.description and list.description|length > 100 %}
+              <button class="btn btn-link btn-sm p-0 mb-3 toggle-btn" data-target="list-desc-{{ list.id }}">Read More</button>
+              {% endif %}
 
               <div class="mt-auto">
-                <p class="text-secondary small mb-3"><i class="bi bi-collection-play me-1"></i> {{ list.movies|length }} movies</p>
+                <p class="text-secondary small mb-3"><i class="bi bi-collection-play me-1"></i> {{ list.movie_count }} movies</p>
                 <div class="d-grid gap-2">
                   <a href="{{ url_for('main.view_list', list_id=list.id) }}" class="btn btn-main btn-sm w-100">View List</a>
-                  {% if list.user_id == current_user.id %}
-                  <form
-                    action="{{ url_for('main.delete_list', list_id=list.id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Are you sure you want to delete this list?');"
-                  >
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-trash me-1"></i> Delete List</button>
-                  </form>
-                  {% endif %}
                 </div>
               </div>
             </div>
@@ -73,11 +73,18 @@
             <div class="card-body p-4 d-flex flex-column">
               <h5 class="card-title fw-bold">{{ list.name }}</h5>
               <p class="text-muted small">Curated by: {{ list.owner.username }}</p>
-              <p class="card-text text-secondary small mb-4">
-                {{ list.description[:100] }}{{ "..." if list.description and list.description|length > 100 }}
-              </p>
+              <div
+                id="pub-desc-{{ list.id }}"
+                class="expandable-content collapsed {% if list.description and list.description|length > 100 %}is-long{% endif %}"
+              >
+                <p class="card-text text-secondary small mb-3">{{ list.description or "No description provided." }}</p>
+              </div>
+              {% if list.description and list.description|length > 100 %}
+              <button class="btn btn-link btn-sm p-0 mb-3 toggle-btn" data-target="pub-desc-{{ list.id }}">Read More</button>
+              {% endif %}
+
               <div class="mt-auto">
-                <p class="text-secondary small mb-3"><i class="bi bi-collection-play me-1"></i> {{ list.movies|length }} movies</p>
+                <p class="text-secondary small mb-3"><i class="bi bi-collection-play me-1"></i> {{ list.movie_count }} movies</p>
                 <a href="{{ url_for('main.view_list', list_id=list.id) }}" class="btn btn-main btn-sm w-100">View List</a>
               </div>
             </div>
@@ -124,5 +131,5 @@
       </div>
     </div>
   </div>
-  {% endblock %}
 </div>
+{% endblock %}

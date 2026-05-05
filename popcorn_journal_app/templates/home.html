@@ -2,21 +2,21 @@
 <div class="container mt-5">
   <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
     <h1 class="display-5 fw-bold">Welcome back, {{ current_user.username }}!</h1>
-    <p class="col-md-8 fs-4">Your cinematic journey continues here. Explore what the community is watching.</p>
+    <p class="col-md-8 text-secondary">Your cinematic journey continues here. Explore what the community is watching.</p>
     <hr class="my-4" />
 
     <div class="row g-4 py-2">
       <div class="col-md-4">
-        <h6><strong>Add movies to a user-built database</strong></h6>
-        <p class="small text-muted">Add and contribute to our global database and share your rating.</p>
+        <h6><strong>Add movies</strong></h6>
+        <p class="small text-muted">Add and contribute to our global database and share your reviews</p>
       </div>
       <div class="col-md-4">
-        <h6><strong>Build lists</strong></h6>
-        <p class="small text-muted">Organise your favourites into public or private collections.</p>
+        <h6><strong>Build and view lists</strong></h6>
+        <p class="small text-muted">Organise your favourites into public or private collections, and view collections created by the community.</p>
       </div>
       <div class="col-md-4">
         <h6><strong>Connect with others</strong></h6>
-        <p class="small text-muted">Follow other users to see their reviews in your feed.</p>
+        <p class="small text-muted">Discover and like community reviews, and follow other users to see their reviews in your feed.</p>
       </div>
     </div>
   </div>
@@ -25,24 +25,59 @@
     <div class="col-lg-8">
       <h4 class="mb-3 border-bottom pb-2">Recent Reviews</h4>
       {% for review in recent_reviews %}
-      <div class="card mb-3 shadow-sm">
+      <div class="card mb-3 shadow-sm border-0">
         <div class="card-body">
-          <h5 class="card-title">{{ review.movie.title }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Reviewed by {{ review.author.username }}</h6>
-          <p class="card-text">"{{ review.content[:150] }}"</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <span
-              class="badge {% if review.rating >= 9 %} bg-success {% elif review.rating >= 7 %} bg-info text-dark {% elif review.rating >= 5 %} bg-warning text-dark {% else %} bg-danger {% endif %}"
-            >
-              {{ review.rating | int }}/10
-            </span>
-            <button
-              class="btn btn-sm {% if current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
-              data-review-id="{{ review.id }}"
-            >
-              <i class="bi bi-heart{% if current_user in review.likes %}-fill{% endif %}"></i>
-              <span class="like-count">{{ review.likes.count() }}</span>
-            </button>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <img
+              src="{{ url_for('static', filename='img/' + (review.author.profile_pic or 'user.png')) }}"
+              class="rounded-circle border"
+              width="32"
+              height="32"
+              style="object-fit: cover"
+            />
+            <span class="small text-secondary">Review by <strong class="text-dark">{{ review.author.username }}</strong></span>
+          </div>
+          <div class="row g-3">
+            <div class="col-3 col-sm-2">
+              <img
+                src="{{ url_for('static', filename='posters/' + (review.movie.movie_img or 'default.jpg')) }}"
+                class="img-fluid rounded shadow-sm"
+              />
+            </div>
+            <div class="col-9 col-sm-10">
+              <div class="mb-1">
+                <h5 class="d-inline fw-bold text-dark">{{ review.movie.title }}</h5>
+                <span class="text-muted ms-2 small">{{ review.movie.release_year }}</span>
+              </div>
+
+              <div class="mb-2 d-flex align-items-center gap-2">
+                <div class="popcorn-container" style="letter-spacing: 2px">
+                  {% for i in range(1, 11) %} {% if i <= (review.rating | int) %}
+                  <span class="popcorn-full">🍿</span>
+                  {% else %}
+                  <span class="popcorn-empty">🍿</span>
+                  {% endif %} {% endfor %}
+                </div>
+                <span class="badge rounded-pill" style="background-color: var(--accent-yellow); color: white; font-size: 0.75rem">
+                  {{ review.rating | int }}/10
+                </span>
+              </div>
+
+              <p class="card-text text-secondary mb-3">"{{ review.content[:150] }}{% if review.content|length > 150 %}...{% endif %}"</p>
+
+              <div class="d-flex align-items-center mt-2">
+                <div class="like-container">
+                  <button
+                    class="btn btn-sm d-flex align-items-center gap-1 {% if current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
+                    data-review-id="{{ review.id }}"
+                    style="border-radius: 20px; padding: 4px 12px"
+                  >
+                    <i class="bi bi-heart{% if current_user in review.likes %}-fill{% endif %}"></i>
+                    <span class="like-count fw-bold">{{ review.likes.count() }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -50,48 +85,58 @@
     </div>
 
     <div class="col-lg-4">
-      <div class="card p-3 mb-4 border-primary">
-        <h5 class="fw-bold">Your Impact</h5>
-        <ul class="list-unstyled">
-          <li>🎬 <strong>{{ current_user.logged_movie_count }}</strong> Movies Logged</li>
-          <li>👥 <strong>{{ current_user.followers.count() }}</strong> Followers</li>
-          <li>📜 <strong>{{ current_user.lists.count() }}</strong> Personal Lists</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="row mt-5">
-    <div class="col-12">
-      <h4 class="mb-4 border-bottom pb-2">Featured Community Lists</h4>
-    </div>
-    {% for user_list in public_lists %}
-    <div class="col-md-6 col-lg-3 mb-4">
-      <div class="card h-100 shadow-sm border-0">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="fw-bold mb-0 text-truncate" style="max-width: 70%">{{ user_list.name }}</h5>
-            <span class="badge bg-secondary">{{ user_list.movies|length }} movies</span>
+      <div class="card p-4 mb-4 border-0 shadow-sm border-top border-5" style="border-top-color: var(--accent-yellow) !important">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-dark">Your Statistics</h5>
+          <a
+            href="{{ url_for('main.profile', username=current_user.username) }}"
+            class="btn btn-sm btn-link text-decoration-none p-0"
+            style="color: var(--accent-red)"
+            >View Profile</a
+          >
+        </div>
+
+        <div class="d-flex flex-column gap-2">
+          <div class="d-flex justify-content-between text-secondary border-bottom pb-2">
+            <span>Movies Reviewed</span>
+            <span class="fw-bold text-dark">{{ current_user.reviews.count() }}</span>
           </div>
-          <p class="text-secondary small mb-3 flex-grow-1">
-            {{ user_list.description[:80] }}{% if user_list.description|length > 80 %}...{% endif %}
-          </p>
-          <div class="mt-auto">
-            <h6 class="small fw-bold text-muted mb-2">Sneak Peek:</h6>
-            <ul class="list-unstyled mb-3">
-              {% for movie in user_list.movies[:3] %}
-              <li class="small text-truncate"><i class="bi bi-film me-2 text-primary"></i>{{ movie.title }}</li>
-              {% endfor %}
-            </ul>
-            <a href="{{ url_for('main.view_list', list_id=user_list.id) }}" class="btn btn-outline-primary btn-sm w-100">View Full List</a>
+          <div class="d-flex justify-content-between text-secondary border-bottom pb-2">
+            <span>Followers</span>
+            <span class="fw-bold text-dark">{{ current_user.followers.count() }}</span>
+          </div>
+          <div class="d-flex justify-content-between text-secondary">
+            <span>Personal Lists</span>
+            <span class="fw-bold text-dark">{{ current_user.lists.count() }}</span>
           </div>
         </div>
       </div>
+
+      <h4 class="mb-3 border-bottom pb-2">Community Lists</h4>
+      {% for user_list in public_lists %}
+      <div class="card mb-3 shadow-sm border-0">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <img
+              src="{{ url_for('static', filename='img/' + (user_list.owner.profile_pic or 'user.png')) }}"
+              class="rounded-circle"
+              width="24"
+              height="24"
+              style="object-fit: cover"
+            />
+            <span class="text-muted" style="font-size: 0.75rem">Created by <strong>{{ user_list.owner.username }}</strong></span>
+          </div>
+
+          <h6 class="fw-bold text-truncate mb-1">{{ user_list.name }}</h6>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <p class="text-secondary small mt-2 mb-1"><i class="bi bi-collection-play me-1"></i> {{ user_list.movie_count }} movies</p>
+          </div>
+          <p class="text-secondary small mb-2 text-truncate">{{ user_list.description or 'No description.' }}</p>
+          <a href="{{ url_for('main.view_list', list_id=user_list.id) }}" class="btn btn-main btn-outline-primary w-100">View List</a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-    {% else %}
-    <div class="col-12"><p class="text-muted text-center">No public lists to feature yet.</p></div>
-    {% endfor %}
   </div>
 </div>
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/like.js') }}"></script>
 {% endblock %}
