@@ -13,14 +13,20 @@ followers = db.Table('followers',
 )
 
 watchlist_items = db.Table('watchlist_items',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True)
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id', ondelete='CASCADE'), primary_key=True)
 )
 
 # Association table for lists of movies (many-to-many relationship)
 list_movies = db.Table('list_movies',
     db.Column('list_id', db.Integer, db.ForeignKey('list.id'), primary_key=True),
     db.Column('movie_id', db.Integer, db.ForeignKey('movie.id'), primary_key=True)
+)
+
+# Association table for review likes
+review_likes = db.Table('review_likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('review_id', db.Integer, db.ForeignKey('review.id'), primary_key=True)
 )
 
 class User(db.Model, UserMixin):
@@ -36,13 +42,16 @@ class User(db.Model, UserMixin):
     profile_pic = db.Column(db.String(120), default='user.png')
     bio = db.Column(db.String(256), nullable=True)
     watchlist = db.relationship('Movie', secondary=watchlist_items, backref=db.backref('interested_users', lazy='dynamic'))
-    reviews = db.relationship('Review', backref='author', cascade='all, delete-orphan')
-    lists = db.relationship('List', backref='owner', cascade='all, delete-orphan')
+    reviews = db.relationship('Review', backref='author', lazy='dynamic', cascade='all, delete-orphan')
+    liked_reviews = db.relationship('Review', secondary=review_likes, backref=db.backref('likes', lazy='dynamic'), lazy='dynamic')
+    lists = db.relationship('List', backref='owner', lazy='dynamic', cascade='all, delete-orphan')
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     def check_password(self, password):
+        if self.password_hash is None:
+            return False
         return check_password_hash(self.password_hash, password)
 
     # Relationships for followers
@@ -54,11 +63,14 @@ class User(db.Model, UserMixin):
     # STATISTICS
     # Note: Will need to determine the best way to calculate these counts,
     # such as http GET actual values from database and then get length of each list.
-    follower_count = db.Column(db.Integer, default=0) # number of followers for the user
-    review_count = db.Column(db.Integer, default=0) # number of reviews written by the user
-    list_count = db.Column(db.Integer, default=0) # number of lists created by the user
-    logged_movie_count = db.Column(db.Integer, default=0) # number of movies watched by the user AGAIN, will need to change this so it is calculated from the length of the list in the database.
-    logged_series_count = db.Column(db.Integer, default=0) # number of series watched by the user, same as above.
+    # follower_count = db.Column(db.Integer, default=0) # number of followers for the user
+    # review_count = db.Column(db.Integer, default=0) # number of reviews written by the user
+    # list_count = db.Column(db.Integer, default=0) # number of lists created by the user
+    # logged_movie_count = db.Column(db.Integer, default=0) # number of movies watched by the user AGAIN, will need to change this so it is calculated from the length of the list in the database.
+
+    @property
+    def watchlist_count(self):
+        return len(self.watchlist)
 
     def follow(self, user):
         """Follow a user"""
@@ -85,22 +97,18 @@ class Movie(db.Model):
     director = db.Column(db.String(64))
     release_year = db.Column(db.Integer)
     genre = db.Column(db.String(64))
+    synopsis = db.Column(db.Text, nullable=True)
     movie_img = db.Column(db.String(256), nullable=True) # URL or file path to movie cover image
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     reviews = db.relationship('Review', backref='movie', lazy=True)
+    def get_average_rating(self):
+        if not self.reviews:
+            return 0
+        total = sum(review.rating for review in self.reviews)
+        return total / len(self.reviews)
 
     def __repr__(self):
         return f'<Movie {self.title}>'
-
-class Series(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(128))
-    director = db.Column(db.String(64))
-    release_year = db.Column(db.Integer)
-    series_img = db.Column(db.String(256), nullable=True) # URL or file path to series cover image (perhaps latest season's poster)
-
-    def __repr__(self):
-        return f'<Series {self.title}>'
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -108,7 +116,7 @@ class Review(db.Model):
     movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'), nullable=True) 
     series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=True)
     
-    rating = db.Column(db.Float) 
+    rating = db.Column(db.Integer) 
     content = db.Column(db.Text)
     date_posted = db.Column(db.DateTime, default=db.func.now())
     like_count = db.Column(db.Integer, default=0)
@@ -122,11 +130,12 @@ class List(db.Model):
     name = db.Column(db.String(128)) # name of the list
     description = db.Column(db.Text) # description of the list
     public_status = db.Column(db.Boolean, default=False) # public or private list, default = private
-    type = db.Column(db.String(10)) # 'watchlist' or 'custom'
-    content_type = db.Column(db.String(10))  # 'movie' or 'series' or 'mixed'
-    content_ids = db.Column(db.String) # comma-separated list of movie/series IDs
     follower_count = db.Column(db.Integer, default=0) # number of followers for the list
     movies = db.relationship('Movie', secondary='list_movies', backref='contained_in_lists')
+
+    @property
+    def movie_count(self):
+        return len(self.movies)
     
     def __repr__(self):
         return f'<List {self.name} by User {self.user_id}>'

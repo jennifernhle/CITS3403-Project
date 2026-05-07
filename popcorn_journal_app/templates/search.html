@@ -45,7 +45,12 @@
   </div>
 
   <!-- Results -->
-  <h4 class="mb-4 fw-bold">Results</h4>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Results</h4>
+    <a href="{{ url_for('main.add_movie') }}" class="btn btn-outline-main btn-sm">
+      <i class="bi bi-plus-lg me-1"></i> Can't find what you're looking for? Help the community by adding it!
+    </a>
+  </div>
   <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
     {% for movie in results %}
     <div class="col">
@@ -66,22 +71,7 @@
           <div class="mt-auto d-flex justify-content-between">
             <a href="{{ url_for('main.movie_detail', movie_id=movie.id) }}" class="btn btn-outline-secondary btn-sm"> View </a>
 
-            <button
-              class="btn btn-main btn-sm add-btn"
-              data-movie-id="{{ movie.id }}"
-              {%
-              if
-              current_user.is_authenticated
-              and
-              movie
-              in
-              current_user.watchlist
-              %}
-              disabled
-              {%
-              endif
-              %}
-            >
+            <button class="btn btn-main watchlist-toggle-btn" data-movie-id="{{ movie.id }}" data-csrf-token="{{ csrf_token() }}">
               {% if current_user.is_authenticated and movie in current_user.watchlist %} ✓ Added {% else %} + Watchlist {% endif %}
             </button>
           </div>
@@ -91,28 +81,5 @@
     {% endfor %}
   </div>
 </div>
-
-<!--js-->
-<script>
-  document.querySelectorAll(".add-btn").forEach((button) => {
-    button.addEventListener("click", function () {
-      const movieId = this.dataset.movieId;
-
-      fetch(`/watchlist/toggle/${movieId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            this.textContent = "✓ Added";
-            this.classList.replace("btn-main", "btn-success");
-            this.disabled = true;
-          }
-        })
-        .catch((error) => console.error("Error:", error));
-    });
-  });
-</script>
 
 {% endblock %}
