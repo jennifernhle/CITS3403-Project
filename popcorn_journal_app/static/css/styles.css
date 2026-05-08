@@ -310,6 +310,63 @@ body {
   object-fit: cover;
 }
 
+.search-filter-card {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.search-poster {
+  height: 300px;
+  object-fit: cover;
+}
+
+.toast-stack {
+  z-index: 1055;
+}
+
+.d-none-initial {
+  display: none;
+}
+
+.tmdb-container {
+  margin-top: 0.25rem;
+}
+
+.movie-title-header {
+  word-wrap: break-word;
+}
+
+.avatar-md {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+
+.rating-badge-yellow {
+  background-color: var(--accent-yellow);
+  color: white;
+}
+
+.font-xs {
+  font-size: 0.75rem;
+}
+
+.review-card {
+  transition: transform 0.2s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+}
+
+#primary-nav .nav-profile-img {
+  width: 30px !important;
+  height: 30px !important;
+  object-fit: cover;
+}
+
 /* PAGINATION */
 .pagination .page-link {
   color: var(--accent-yellow);

@@ -47,10 +47,6 @@
             </ul>
 
             <ul class="navbar-nav ms-auto">
-              {% if current_user.is_anonymous %} {% else %} {% endif %}
-            </ul>
-
-            <ul class="navbar-nav ms-auto">
               {% if current_user.is_anonymous %}
               <li class="nav-item">
                 <a href="{{ url_for('main.login') }}" class="nav-link">Sign In</a>
@@ -65,8 +61,7 @@
                   <img
                     src="{{ url_for('static', filename='img/' + (current_user.profile_pic or 'user.png')) }}"
                     alt="Profile"
-                    class="rounded-circle me-2"
-                    style="width: 30px; height: 30px; object-fit: cover"
+                    class="rounded-circle me-2 nav-profile-img"
                   />Hi, {{ current_user.username }} {% endif %}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -125,12 +120,15 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Possibly move these to their relevant files depending on needs and requirements-->
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/like.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lists.js') }}"></script>
     <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/user-interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/user-interaction.js') }}"></script>
     <script src="{{ url_for('static', filename='js/watchlist.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

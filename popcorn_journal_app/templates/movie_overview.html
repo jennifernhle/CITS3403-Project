@@ -5,16 +5,18 @@
       <div class="card shadow-sm border-0 p-4 p-md-5 mb-5">
         <div class="row g-4 align-items-start">
           <div class="col-md-4">
-            {% if movie.movie_img %}
+            {% if movie.tmdb_id and movie.movie_img %}
+            <img src="https://image.tmdb.org/t/p/w500{{ movie.movie_img }}" class="img-fluid rounded shadow-sm" alt="{{ movie.title }}" />
+            {% elif movie.movie_img %}
             <img src="{{ url_for('static', filename='posters/' + movie.movie_img) }}" class="img-fluid rounded shadow-sm" alt="{{ movie.title }}" />
             {% else %}
-            <img src="https://picsum.photos/400/600" class="img-fluid rounded shadow-sm" alt="No Poster" />
+            <img src="{{ url_for('static', filename='posters/default.jpg') }}" class="img-fluid rounded shadow-sm" alt="No Poster" />
             {% endif %}
           </div>
 
           <div class="col-md-8">
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <h1 class="fw-bold mb-0" style="word-wrap: break-word">{{ movie.title }}</h1>
+              <h1 class="fw-bold mb-0 movie-title-header">{{ movie.title }}</h1>
               {% if current_user.is_authenticated %}
               <div class="d-flex gap-2 ms-3">
                 <button
@@ -25,20 +27,11 @@
                 >
                   <i class="bi bi-pencil me-1"></i>Edit Details
                 </button>
-                <form
-                  action="{{ url_for('main.delete_movie', movie_id=movie.id) }}"
-                  method="POST"
-                  onsubmit="return confirm('Are you sure you want to delete this movie?');"
-                  style="display: inline"
-                >
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                  <button type="submit" class="btn btn-outline-danger btn-sm text-nowrap"><i class="bi bi-trash me-1"></i>Delete</button>
-                </form>
               </div>
               {% endif %}
             </div>
             <p class="text-secondary fs-5 mb-3">
-              {{ movie.release_year }} • Directed by {{ movie.director }} {% if movie.genre %} •
+              {{ movie.release_year }} • Directed by {{ movie.director or 'Unknown' }} {% if movie.genre %} •
               <span class="badge bg-info text-dark">{{ movie.genre }}</span>{% endif %}
             </p>
 
@@ -99,25 +92,21 @@
             <div class="card h-100 shadow-sm border-0">
               <div class="card-body p-4">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                  <img
-                    src="{{ url_for('static', filename='img/' + (review.author.profile_pic or 'user.png')) }}"
-                    class="rounded-circle shadow-sm border"
-                    width="48"
-                    height="48"
-                    style="object-fit: cover"
-                  />
+                  <a href="{{ url_for('main.other_user', user_id=review.author.id) }}" class="text-decoration-none">
+                    <img
+                      src="{{ url_for('static', filename='img/' + (review.author.profile_pic or 'user.png')) }}"
+                      class="rounded-circle shadow-sm border avatar-md"
+                    />
+                  </a>
                   <div class="flex-grow-1">
-                    <h5 class="mb-0 fw-bold">{{ review.author.username }}</h5>
+                    <a href="{{ url_for('main.other_user', user_id=review.author.id) }}" class="text-decoration-none">
+                      <h5 class="mb-0 fw-bold text-dark">{{ review.author.username }}</h5>
+                    </a>
                     <small class="text-muted">{{ review.date_posted.strftime('%d %b %Y') if review.date_posted else '' }}</small>
                     {% if current_user.is_authenticated and review.user_id == current_user.id %}
                     <form action="{{ url_for('main.delete_review', review_id=review.id) }}" method="POST" class="d-inline ms-2">
                       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                      <button
-                        type="submit"
-                        class="btn btn-link text-danger p-0 small"
-                        style="font-size: 0.75rem"
-                        onclick="return confirm('Delete this review?');"
-                      >
+                      <button type="submit" class="btn btn-link text-danger p-0 font-xs" onclick="return confirm('Delete this review?');">
                         (Remove)
                       </button>
                     </form>
@@ -132,9 +121,7 @@
                       <span class="popcorn-empty">🍿</span>
                       {% endif %} {% endfor %}
                     </div>
-                    <span class="badge rounded-pill" style="background-color: var(--accent-yellow); color: white">
-                      {{ review.rating | int }}/10
-                    </span>
+                    <span class="badge rounded-pill rating-badge-yellow"> {{ review.rating | int }}/10 </span>
                     <button
                       class="btn btn-sm {% if current_user.is_authenticated and current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn border-0"
                       data-review-id="{{ review.id }}"
