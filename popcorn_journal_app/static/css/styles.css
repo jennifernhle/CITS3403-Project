@@ -295,6 +295,21 @@ body {
   font-size: 0.75rem;
 }
 
+.text-pre-wrap {
+  white-space: pre-wrap;
+}
+
+.list-poster {
+  height: 300px;
+  object-fit: cover;
+}
+
+.avatar-preview-sm {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
 /* PAGINATION */
 .pagination .page-link {
   color: var(--accent-yellow);

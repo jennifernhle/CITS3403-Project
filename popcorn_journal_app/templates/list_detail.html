@@ -11,7 +11,12 @@
               {{ 'Public' if user_list.public_status else 'Private' }}
             </span>
           </div>
-          <p class="text-secondary mt-1 mb-0">Curated by {{ user_list.owner.username }}</p>
+          <p class="text-secondary mt-1 mb-0">
+            Curated by
+            <a href="{{ url_for('main.other_user', user_id=user_list.owner.id) }}" class="text-decoration-none text-secondary fw-medium">
+              {{ user_list.owner.username }}
+            </a>
+          </p>
         </div>
         {% if user_list.user_id == current_user.id %}
         <div class="d-flex gap-2">
@@ -38,7 +43,7 @@
         id="list-main-desc"
         class="expandable-content collapsed {% if user_list.description and user_list.description|length > 200 %}is-long{% endif %}"
       >
-        <p class="text-break mb-0" style="white-space: pre-wrap">{{ user_list.description or "No description provided." }}</p>
+        <p class="text-break mb-0 text-pre-wrap">{{ user_list.description or "No description provided." }}</p>
       </div>
 
       {% if user_list.description and user_list.description|length > 200 %}
@@ -51,20 +56,17 @@
     {% for movie in user_list.movies %}
     <div class="col">
       <div class="card h-100 border-0 shadow-sm overflow-hidden">
-        {% if movie.movie_img %}
-        <img
-          src="{{ url_for('static', filename='posters/' + movie.movie_img) }}"
-          class="card-img-top"
-          alt="{{ movie.title }}"
-          style="height: 300px; object-fit: cover"
-        />
+        {% if movie.tmdb_id and movie.movie_img %}
+        <img src="https://image.tmdb.org/t/p/w500{{ movie.movie_img }}" class="card-img-top list-poster" alt="{{ movie.title }}" />
+        {% elif movie.movie_img %}
+        <img src="{{ url_for('static', filename='posters/' + movie.movie_img) }}" class="card-img-top list-poster" alt="{{ movie.title }}" />
         {% else %}
-        <img src="https://picsum.photos/400/600" class="card-img-top" alt="Placeholder" style="height: 300px; object-fit: cover" />
+        <img src="{{ url_for('static', filename='posters/default.jpg') }}" class="card-img-top list-poster" alt="Placeholder" />
         {% endif %}
 
         <div class="card-body d-flex flex-column">
           <h5 class="card-title fw-bold text-truncate mb-1">{{ movie.title }}</h5>
-          <p class="text-muted small mb-3">{{ movie.release_year }} • Directed by {{ movie.director }}</p>
+          <p class="text-secondary small mb-3">{{ movie.release_year }} • Directed by {{ movie.director }}</p>
 
           <div class="mt-auto">
             <div class="d-grid gap-2">

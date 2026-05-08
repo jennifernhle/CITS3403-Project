@@ -8,7 +8,7 @@ from werkzeug.datastructures import FileStorage
 
 from popcorn_journal_app import db
 from popcorn_journal_app.models import User, Movie, Review, List, followers
-from popcorn_journal_app.forms import RegistrationForm, LoginForm, MovieForm, ReviewForm
+from popcorn_journal_app.forms import RegistrationForm, LoginForm, MovieForm, ReviewForm, EditProfileForm
 
 bp = Blueprint('main', __name__)
 
@@ -104,6 +104,33 @@ def profile():
     page = request.args.get('page', 1, type=int)
     reviews_pagination = user.reviews.order_by(Review.date_posted.desc()).paginate(page=page, per_page=5, error_out=False)
     return render_template('profile.html', title='Profile', user=current_user, recent_reviews=reviews_pagination.items, pagination=reviews_pagination)
+
+@bp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        if form.profile_pic.data:
+            filename = secure_filename(form.profile_pic.data.filename)
+            form.profile_pic.data.save(os.path.join(current_app.root_path, 'static/img', filename))
+        
+            current_user.profile_pic = filename
+    
+        current_user.username = form.username.data
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.bio = form.bio.data
+
+        db.session.commit()
+        flash('Your profile has been updated!')
+        return redirect(url_for('main.profile'))
+    
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.bio.data = current_user.bio
+    return render_template('settings.html', title='Edit Profile', form=form)
 
 @bp.route('/user/<int:user_id>')
 def other_user(user_id):
