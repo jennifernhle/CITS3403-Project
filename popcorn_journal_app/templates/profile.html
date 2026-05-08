@@ -1,5 +1,4 @@
-{% extends "base.html" %} {% block title%} {{ title }} {% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block title%} {{ title }} {% endblock %} {% block content %}
 
 <div class="container py-5">
   <div class="row align-items-center mb-4">
@@ -12,112 +11,188 @@ content %}
         height="100"
       />
       <div>
-        <h2 class="fw-bold mb-0">{{ current_user.username }}</h2>
-        <div class="col">
-          <h2 class="fw-bold mb-0">
-            {% if current_user.first_name %} {{ current_user.first_name }} {{
-            current_user.last_name }} {% else %} {{ current_user.username }} {%
-            endif %}
-          </h2>
-        </div>
-        <p class="text-secondary mb-0">
-          Member since {% if current_user.member_since %} {{
-          current_user.member_since.strftime('%B %Y') }} {% else %} 2026 {%
-          endif %}
+        <h2 class="fw-bold mb-1">
+          {% if current_user.first_name %}{{ current_user.first_name }} {{ current_user.last_name }}{% else %}{{ current_user.username }}{% endif %}
+        </h2>
+        <p class="text-secondary mb-2">
+          @{{ current_user.username }} • Joined {{ current_user.member_since.strftime('%B %Y') if current_user.member_since else '2026' }}
         </p>
+        <div id="profile-statistics" class="d-flex gap-3 mb-3">
+          <span class="small"><strong id="follower-count-value">{{ follower_count }}</strong> Followers</span>
+          <span class="small"><strong>{{ following_count }}</strong> Following</span>
+          <span class="small"><strong>{{ current_user.logged_movie_count }}</strong> Reviews</span>
+          <span class="small"><strong>{{ current_user.list_count }}</strong> Lists</span>
+        </div>
       </div>
     </div>
-
-    <div class="col-auto">
-      <a href="{{url_for('main.edit_profile')}}" class="btn btn-main">
-        Edit Profile
-      </a>
-    </div>
-  </div>
-  <div id="profile-statistics" class="d-flex gap-4 mb-4">
-    <a href="#" class="text-decoration-none text-dark">
-      <span>{{ follower_count }}</span>
-      <span>Followers</span>
-    </a>
-    <a href="#" class="text-decoration-none text-dark">
-      <span>{{ following_count }}</span>
-      <span>Following</span>
-    </a>
-    <a href="#" class="text-decoration-none text-dark">
-      <span> {{ user.logged_movie_count }}</span>
-      <span>Movies</span>
-    </a>
-    <a href="#" class="text-decoration-none text-dark">
-      <span>{{ user.list_count }}</span>
-      <span>Lists</span>
-    </a>
   </div>
 
   <div class="row g-5">
     <div class="col-lg-8">
-      <section class="mb-5">
-        <h4 class="fw-bold border-bottom pb-2 mb-3">About Me</h4>
-        <p class="text-secondary">
-          {% if user.bio %} {{ user.bio }} {% else %} This user hasn't written a
-          bio yet. {% endif %}
-        </p>
-      </section>
+      <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#about">Overview</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#social">Community</button>
+        </li>
+      </ul>
 
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <h5 class="fw-bold mb-3">
-            <i class="bi bi-film me-2 text-secondary"></i>Favourite Movies
-          </h5>
-          <div class="p-4 bg-light rounded border text-center text-muted small">
-            Your top 4 cinema picks will appear here.
-          </div>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="about">
+          <section class="mb-4">
+            <h6 class="text-uppercase text-secondary fw-bold small">Bio</h6>
+            <p class="text-secondary lead" style="font-size: 1.1rem">{{ user.bio or "I have a passion for cinema." }}</p>
+          </section>
+
+          <section class="mb-5">
+            <h5 class="fw-bold mb-4">Recent Reviews</h5>
+            {% if recent_reviews %} {% for review in recent_reviews %}
+            <div class="card border-0 shadow-sm mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                  <a href="{{ url_for('main.movie_detail', movie_id=review.movie_id) }}" class="text-decoration-none">
+                    <h6 class="fw-bold mb-0 text-dark">{{ review.movie.title }}</h6>
+                  </a>
+                  <span class="badge bg-warning text-dark">{{ review.rating }}/10</span>
+                </div>
+                <p class="mb-1 text-secondary small">{{ review.content[:200] }}{% if review.content|length > 200 %}...{% endif %}</p>
+                <small class="text-secondary">{{ review.date_posted.strftime('%d %b, %Y') }}</small>
+              </div>
+            </div>
+            {% endfor %}
+
+            <nav aria-label="Review pagination" class="mt-4">
+              <ul class="pagination pagination-sm justify-content-center">
+                <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+                  <a class="page-link" href="{{ url_for('main.profile', page=pagination.prev_num) if pagination.has_prev else '#' }}">&laquo;</a>
+                </li>
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %} {% if page_num %}
+                <li class="page-item {{ 'active' if page_num == pagination.page }}">
+                  <a class="page-link" href="{{ url_for('main.profile', page=page_num) }}"> {{ page_num }} </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %} {% endfor %}
+                <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+                  <a class="page-link" href="{{ url_for('main.profile', page=pagination.next_num) if pagination.has_next else '#' }}">&raquo;</a>
+                </li>
+              </ul>
+            </nav>
+            {% else %}
+            <p class="text-secondary italic">No reviews yet.</p>
+            {% endif %}
+          </section>
         </div>
-        <div class="col-md-6 mb-4">
-          <h5 class="fw-bold mb-3">
-            <i class="bi bi-tv me-2 text-secondary"></i>Favourite TV Shows
-          </h5>
-          <div class="p-4 bg-light rounded border text-center text-muted small">
-            Your top 4 binge-worthy shows will appear here.
+
+        <div class="tab-pane fade" id="social">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <h6 class="fw-bold mb-3">Following ({{ user.following.count() }})</h6>
+              <div class="list-group list-group-flush border rounded">
+                {% for followed in user.following.all() %}
+                <a
+                  href="{{ url_for('main.other_user', user_id=followed.id) }}"
+                  class="list-group-item list-group-item-action d-flex align-items-center gap-3"
+                >
+                  <img
+                    src="{{ url_for('static', filename='img/' + (followed.profile_pic or 'user.png')) }}"
+                    width="35"
+                    height="35"
+                    class="rounded-circle border"
+                    style="object-fit: cover"
+                  />
+                  <span class="text-dark">{{ followed.username }}</span>
+                </a>
+                {% else %}
+                <div class="p-4 text-secondary small text-center">You aren't following anyone yet.</div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <h6 class="fw-bold mb-3">Followers ({{ user.followers.count() }})</h6>
+              <div class="list-group list-group-flush border rounded">
+                {% for follower in user.followers.all() %}
+                <a
+                  href="{{ url_for('main.other_user', user_id=follower.id) }}"
+                  class="list-group-item list-group-item-action d-flex align-items-center gap-3"
+                >
+                  <img
+                    src="{{ url_for('static', filename='img/' + (follower.profile_pic or 'user.png')) }}"
+                    width="35"
+                    height="35"
+                    class="rounded-circle border"
+                    style="object-fit: cover"
+                  />
+                  <span class="text-dark">{{ follower.username }}</span>
+                </a>
+                {% else %}
+                <div class="p-4 text-secondary small text-center">No followers yet.</div>
+                {% endfor %}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm bg-dark mb-4">
+        <div class="card-body p-4">
+          <h6 class="text-uppercase small fw-bold opacity-75 mb-3">Your Statistics</h6>
 
-    <div class="col-lg-3">
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Recent Activity</h5>
-            <a href="#" class="text-main small text-decoration-none fw-bold"
-              >MORE</a
-            >
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-primary bg-opacity-25 p-2 rounded me-3">
+              <i class="bi bi-bookmark-fill text-primary"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Watchlist</div>
+              <div class="fw-bold fs-5">{{ current_user.watchlist|length }}</div>
+            </div>
           </div>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item px-0 py-2 small text-secondary">
-              <i class="bi bi-eye me-2"></i> Watched <strong>Inception</strong>
-            </li>
-            <li
-              class="list-group-item px-0 py-2 small text-secondary text-center italic"
-            >
-              No recent activity to show.
-            </li>
-          </ul>
+
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-warning bg-opacity-25 p-2 rounded me-3">
+              <i class="bi bi-star-fill text-warning"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Total Reviews</div>
+              <div class="fw-bold fs-5">{{ current_user.reviews.count() }}</div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-success bg-opacity-25 p-2 rounded me-3">
+              <i class="bi bi-list-ul text-success"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Public Lists</div>
+              <div class="fw-bold fs-5">{{ current_user.lists.count() }}</div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <div class="bg-danger bg-opacity-10 p-2 rounded me-3">
+              <i class="bi bi-people-fill text-danger"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Followers</div>
+              <div class="fw-bold fs-5">{{ current_user.followers.count() }}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Recent Reviews</h5>
-            <a href="#" class="text-main small text-decoration-none fw-bold"
-              >MORE</a
-            >
+      <div class="card border-0 shadow-sm border">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3 text-uppercase small text-secondary">Quick Actions</h6>
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('main.lists') }}" class="btn btn-main btn-sm text-start"> <i class="bi bi-list-ul me-2"></i> Manage My Lists </a>
+            <a href="{{ url_for('main.watchlist') }}" class="btn btn-main btn-sm text-start">
+              <i class="bi bi-list-check me-2"></i> Manage My Watchlist
+            </a>
+            <a href="{{ url_for('main.search') }}" class="btn btn-main btn-sm text-start"> <i class="bi bi-search me-2"></i> Search and Import </a>
+            <a href="{{ url_for('main.edit_profile') }}" class="btn btn-main btn-sm text-start"> <i class="bi bi-gear me-2"></i> Profile Settings </a>
           </div>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item px-0 py-2 small text-secondary italic">
-              You haven't written any reviews yet.
-            </li>
-          </ul>
         </div>
       </div>
     </div>

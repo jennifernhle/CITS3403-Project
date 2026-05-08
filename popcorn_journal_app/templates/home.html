@@ -2,112 +2,313 @@
 <div class="container mt-5">
   <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
     <h1 class="display-5 fw-bold">Welcome back, {{ current_user.username }}!</h1>
-    <p class="col-md-8 text-secondary">Your cinematic journey continues here. Explore what the community is watching.</p>
+    <p class="col-md-8 text-secondary">Your cinematic journey continues here.</p>
     <hr class="my-4" />
 
     <div class="row g-4 py-2">
       <div class="col-md-4">
-        <h6><strong>Add movies</strong></h6>
-        <p class="small text-muted">Add and contribute to our global database and share your reviews</p>
+        <h6><strong>Add movies and share reviews</strong></h6>
+        <p class="small text-secondary">Add and contribute to our global database and share your reviews.</p>
       </div>
       <div class="col-md-4">
         <h6><strong>Build and view lists</strong></h6>
-        <p class="small text-muted">Organise your favourites into public or private collections, and view collections created by the community.</p>
+        <p class="small text-secondary">
+          Organise your favourites into public or private collections, and view collections created by the community.
+        </p>
       </div>
       <div class="col-md-4">
         <h6><strong>Connect with others</strong></h6>
-        <p class="small text-muted">Discover and like community reviews, and follow other users to see their reviews in your feed.</p>
+        <p class="small text-secondary">Discover and like community reviews, and follow other users to see their reviews in your feed.</p>
       </div>
     </div>
   </div>
 
   <div class="row">
     <div class="col-lg-8">
-      <h4 class="mb-3 border-bottom pb-2">Recent Reviews</h4>
-      {% for review in recent_reviews %}
-      <div class="card mb-3 shadow-sm border-0">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <img
-              src="{{ url_for('static', filename='img/' + (review.author.profile_pic or 'user.png')) }}"
-              class="rounded-circle border"
-              width="32"
-              height="32"
-              style="object-fit: cover"
-            />
-            <span class="small text-secondary">Review by <strong class="text-dark">{{ review.author.username }}</strong></span>
-          </div>
-          <div class="row g-3">
-            <div class="col-3 col-sm-2">
-              <img
-                src="{{ url_for('static', filename='posters/' + (review.movie.movie_img or 'default.jpg')) }}"
-                class="img-fluid rounded shadow-sm"
-              />
-            </div>
-            <div class="col-9 col-sm-10">
-              <div class="mb-1">
-                <h5 class="d-inline fw-bold text-dark">{{ review.movie.title }}</h5>
-                <span class="text-muted ms-2 small">{{ review.movie.release_year }}</span>
-              </div>
+      <ul class="nav nav-tabs mb-4" id="feedTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link {{ 'active' if active_tab == 'global' }} fw-bold"
+            id="global-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#global-feed"
+          >
+            Global Activity
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link {{ 'active' if active_tab == 'following' }} fw-bold"
+            id="following-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#following-feed"
+          >
+            Following
+          </button>
+        </li>
+      </ul>
 
-              <div class="mb-2 d-flex align-items-center gap-2">
-                <div class="popcorn-container" style="letter-spacing: 2px">
-                  {% for i in range(1, 11) %} {% if i <= (review.rating | int) %}
-                  <span class="popcorn-full">🍿</span>
+      <div class="tab-content" id="feedTabsContent">
+        <div class="tab-pane fade {{ 'show active' if active_tab == 'global' }}" id="global-feed" role="tabpanel">
+          {% for review in recent_reviews %}
+          <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <a href="{{ url_for('main.other_user', user_id=review.author.id) }}" class="text-decoration-none">
+                  <img
+                    src="{{ url_for('static', filename='img/' + (review.author.profile_pic or 'user.png')) }}"
+                    class="profile-thumb rounded-circle border"
+                    width="32"
+                    height="32"
+                  />
+                </a>
+                <span class="small text-secondary"
+                  >Review by
+                  <a href="{{ url_for('main.other_user', user_id=review.author.id) }}" class="text-decoration-none">
+                    <strong class="text-dark">{{ review.author.username }}</strong>
+                  </a>
+                </span>
+              </div>
+              <div class="row g-3">
+                <div class="col-3 col-sm-2">
+                  {% if review.movie.tmdb_id and review.movie.movie_img %}
+                  <img
+                    src="https://image.tmdb.org/t/p/w500{{ review.movie.movie_img }}"
+                    class="img-fluid rounded shadow-sm"
+                    alt="{{ review.movie.title }}"
+                  />
+                  {% elif review.movie.movie_img %}
+                  <img
+                    src="{{ url_for('static', filename='posters/' + review.movie.movie_img) }}"
+                    class="img-fluid rounded shadow-sm"
+                    alt="{{ review.movie.title }}"
+                  />
                   {% else %}
-                  <span class="popcorn-empty">🍿</span>
-                  {% endif %} {% endfor %}
+                  <img src="{{ url_for('static', filename='posters/default.jpg') }}" class="img-fluid rounded shadow-sm" alt="Default Poster" />
+                  {% endif %}
                 </div>
-                <span class="badge rounded-pill" style="background-color: var(--accent-yellow); color: white; font-size: 0.75rem">
-                  {{ review.rating | int }}/10
+                <div class="col-9 col-sm-10">
+                  <div class="mb-1">
+                    <a href="{{ url_for('main.movie_detail', movie_id=review.movie.id) }}" class="text-decoration-none">
+                      <h5 class="d-inline fw-bold text-dark">{{ review.movie.title }}</h5>
+                    </a>
+                    <span class="text-secondary ms-2 small">{{ review.movie.release_year }}</span>
+                  </div>
+                  <div class="mb-2 d-flex align-items-center gap-2">
+                    <div class="popcorn-container">
+                      {% for i in range(1, 11) %}{% if i <= (review.rating | int) %}<span class="popcorn-full">🍿</span>{% else %}<span
+                        class="popcorn-empty"
+                        >🍿</span
+                      >{% endif %}{% endfor %}
+                    </div>
+                    <span class="badge rounded-pill">{{ review.rating | int }}/10</span>
+                  </div>
+                  <p class="card-text text-secondary mb-3">"{{ review.content[:150] }}{% if review.content|length > 150 %}...{% endif %}"</p>
+                  <div class="d-flex align-items-center mt-2">
+                    <button
+                      class="btn btn-sm d-flex align-items-center gap-1 {% if current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
+                      data-review-id="{{ review.id }}"
+                    >
+                      <i class="bi bi-heart{% if current_user in review.likes %}-fill{% endif %}"></i>
+                      <span class="like-count fw-bold">{{ review.likes.count() }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %} {% if recent_pagination and recent_pagination.pages > 1 %}
+          <nav aria-label="Global pagination" class="mt-4">
+            <ul class="pagination pagination-sm justify-content-center">
+              <li class="page-item {{ 'disabled' if not recent_pagination.has_prev }}">
+                <a
+                  class="page-link"
+                  href="{{ url_for('main.index', page=recent_pagination.prev_num, f_page=following_pagination.page, tab='global') }}"
+                  >&laquo;</a
+                >
+              </li>
+
+              {% for page_num in recent_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %} {% if page_num %}
+              <li class="page-item {{ 'active' if page_num == recent_pagination.page }}">
+                <a class="page-link" href="{{ url_for('main.index', page=page_num, f_page=following_pagination.page, tab='global') }}"
+                  >{{ page_num }}</a
+                >
+              </li>
+              {% else %}
+              <li class="page-item disabled"><span class="page-link">...</span></li>
+              {% endif %} {% endfor %}
+
+              <li class="page-item {{ 'disabled' if not recent_pagination.has_next }}">
+                <a
+                  class="page-link"
+                  href="{{ url_for('main.index', page=recent_pagination.next_num, f_page=following_pagination.page, tab='global') }}"
+                  >&raquo;</a
+                >
+              </li>
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+
+        <div class="tab-pane fade {{ 'show active' if active_tab == 'following' }}" id="following-feed" role="tabpanel">
+          {% for review in following_reviews %}
+          <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <a href="{{ url_for('main.other_user', user_id=review.author.id) }}" class="text-decoration-none">
+                  <img
+                    src="{{ url_for('static', filename='img/' + (review.author.profile_pic or 'user.png')) }}"
+                    class="profile-thumb rounded-circle border"
+                    width="32"
+                    height="32"
+                  />
+                </a>
+                <span class="small text-secondary"
+                  >Review by
+                  <a href="{{ url_for('main.other_user', user_id=review.author.id) }}" class="text-decoration-none">
+                    <strong class="text-dark">{{ review.author.username }}</strong>
+                  </a>
                 </span>
               </div>
 
-              <p class="card-text text-secondary mb-3">"{{ review.content[:150] }}{% if review.content|length > 150 %}...{% endif %}"</p>
+              <div class="row g-3">
+                <div class="col-3 col-sm-2">
+                  {% if review.movie.tmdb_id and review.movie.movie_img %}
+                  <img
+                    src="https://image.tmdb.org/t/p/w500{{ review.movie.movie_img }}"
+                    class="img-fluid rounded shadow-sm"
+                    alt="{{ review.movie.title }}"
+                  />
+                  {% elif review.movie.movie_img %}
+                  <img
+                    src="{{ url_for('static', filename='posters/' + review.movie.movie_img) }}"
+                    class="img-fluid rounded shadow-sm"
+                    alt="{{ review.movie.title }}"
+                  />
+                  {% else %}
+                  <img src="{{ url_for('static', filename='posters/default.jpg') }}" class="img-fluid rounded shadow-sm" alt="Default Poster" />
+                  {% endif %}
+                </div>
+                <div class="col-9 col-sm-10">
+                  <div class="mb-1">
+                    <a href="{{ url_for('main.movie_detail', movie_id=review.movie.id) }}" class="text-decoration-none">
+                      <h5 class="d-inline fw-bold text-dark">{{ review.movie.title }}</h5>
+                    </a>
+                    <span class="text-secondary ms-2 small">{{ review.movie.release_year }}</span>
+                  </div>
 
-              <div class="d-flex align-items-center mt-2">
-                <div class="like-container">
-                  <button
-                    class="btn btn-sm d-flex align-items-center gap-1 {% if current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
-                    data-review-id="{{ review.id }}"
-                    style="border-radius: 20px; padding: 4px 12px"
-                  >
-                    <i class="bi bi-heart{% if current_user in review.likes %}-fill{% endif %}"></i>
-                    <span class="like-count fw-bold">{{ review.likes.count() }}</span>
-                  </button>
+                  <div class="mb-2 d-flex align-items-center gap-2">
+                    <div class="popcorn-container">
+                      {% for i in range(1, 11) %} {% if i <= (review.rating | int) %}<span class="popcorn-full">🍿</span> {% else %}<span
+                        class="popcorn-empty"
+                        >🍿</span
+                      >{% endif %} {% endfor %}
+                    </div>
+                    <span class="badge rounded-pill">{{ review.rating | int }}/10</span>
+                  </div>
+
+                  <p class="card-text text-secondary mb-3">"{{ review.content[:150] }}..."</p>
+
+                  <div class="d-flex align-items-center mt-2">
+                    <button
+                      class="btn btn-sm d-flex align-items-center gap-1 {% if current_user in review.likes %}btn-danger text-white{% else %}btn-outline-danger{% endif %} heart-btn"
+                      data-review-id="{{ review.id }}"
+                    >
+                      <i class="bi bi-heart{% if current_user in review.likes %}-fill{% endif %}"></i>
+                      <span class="like-count fw-bold">{{ review.likes.count() }}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          {% else %}
+          <div class="text-center py-5 bg-white rounded shadow-sm border">
+            <i class="bi bi-people text-secondary fs-1"></i>
+            <p class="text-secondary mt-3">Follow users to see their reviews in this feed!</p>
+            <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-sm">Discover People</a>
+          </div>
+          {% endfor %} {% if following_pagination and following_pagination.pages > 1 %}
+          <nav aria-label="Following pagination" class="mt-4">
+            <ul class="pagination pagination-sm justify-content-center">
+              <li class="page-item {{ 'disabled' if not following_pagination.has_prev }}">
+                <a
+                  class="page-link"
+                  href="{{ url_for('main.index', f_page=following_pagination.prev_num, page=recent_pagination.page, tab='following') }}"
+                  >&laquo;</a
+                >
+              </li>
+
+              {% for page_num in following_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %} {% if page_num %}
+              <li class="page-item {{ 'active' if page_num == following_pagination.page }}">
+                <a class="page-link" href="{{ url_for('main.index', f_page=page_num, page=recent_pagination.page, tab='following') }}"
+                  >{{ page_num }}</a
+                >
+              </li>
+              {% else %}
+              <li class="page-item disabled"><span class="page-link">...</span></li>
+              {% endif %} {% endfor %}
+
+              <li class="page-item {{ 'disabled' if not following_pagination.has_next }}">
+                <a
+                  class="page-link"
+                  href="{{ url_for('main.index', f_page=following_pagination.next_num, page=recent_pagination.page, tab='following') }}"
+                  >&raquo;</a
+                >
+              </li>
+            </ul>
+          </nav>
+          {% endif %}
         </div>
       </div>
-      {% endfor %}
     </div>
 
     <div class="col-lg-4">
-      <div class="card p-4 mb-4 border-0 shadow-sm border-top border-5" style="border-top-color: var(--accent-yellow) !important">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0 text-dark">Your Statistics</h5>
-          <a
-            href="{{ url_for('main.profile', username=current_user.username) }}"
-            class="btn btn-sm btn-link text-decoration-none p-0"
-            style="color: var(--accent-red)"
-            >View Profile</a
-          >
-        </div>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h6 class="text-uppercase small fw-bold opacity-75 mb-0">Your Statistics</h6>
+            <a href="{{ url_for('main.profile') }}" class="small text-decoration-none fw-bold">Profile &rarr;</a>
+          </div>
 
-        <div class="d-flex flex-column gap-2">
-          <div class="d-flex justify-content-between text-secondary border-bottom pb-2">
-            <span>Movies Reviewed</span>
-            <span class="fw-bold text-dark">{{ current_user.reviews.count() }}</span>
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-primary bg-opacity-25 p-2 rounded me-3">
+              <i class="bi bi-bookmark-fill text-primary"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Watchlist</div>
+              <div class="fw-bold fs-5">{{ current_user.watchlist|length }}</div>
+            </div>
           </div>
-          <div class="d-flex justify-content-between text-secondary border-bottom pb-2">
-            <span>Followers</span>
-            <span class="fw-bold text-dark">{{ current_user.followers.count() }}</span>
+
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-warning bg-opacity-25 p-2 rounded me-3">
+              <i class="bi bi-star-fill text-warning"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Total Reviews</div>
+              <div class="fw-bold fs-5">{{ current_user.reviews.count() }}</div>
+            </div>
           </div>
-          <div class="d-flex justify-content-between text-secondary">
-            <span>Personal Lists</span>
-            <span class="fw-bold text-dark">{{ current_user.lists.count() }}</span>
+
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-success bg-opacity-25 p-2 rounded me-3">
+              <i class="bi bi-list-ul text-success"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Public Lists</div>
+              <div class="fw-bold fs-5">{{ current_user.lists.count() }}</div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <div class="bg-danger bg-opacity-10 p-2 rounded me-3">
+              <i class="bi bi-people-fill text-danger"></i>
+            </div>
+            <div>
+              <div class="small text-secondary">Followers</div>
+              <div class="fw-bold fs-5">{{ current_user.followers.count() }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -119,14 +320,12 @@
           <div class="d-flex align-items-center gap-2 mb-2">
             <img
               src="{{ url_for('static', filename='img/' + (user_list.owner.profile_pic or 'user.png')) }}"
-              class="rounded-circle"
+              class="profile-thumb rounded-circle"
               width="24"
               height="24"
-              style="object-fit: cover"
             />
-            <span class="text-muted" style="font-size: 0.75rem">Created by <strong>{{ user_list.owner.username }}</strong></span>
+            <span class="text-secondary meta-text">Created by <strong>{{ user_list.owner.username }}</strong></span>
           </div>
-
           <h6 class="fw-bold text-truncate mb-1">{{ user_list.name }}</h6>
           <div class="d-flex justify-content-between align-items-center mb-2">
             <p class="text-secondary small mt-2 mb-1"><i class="bi bi-collection-play me-1"></i> {{ user_list.movie_count }} movies</p>
