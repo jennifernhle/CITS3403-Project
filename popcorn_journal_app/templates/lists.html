@@ -10,15 +10,15 @@
     </button>
   </div>
 
-  <ul class="nav nav-tabs mb-4 border-0" id="listTab" role="tablist">
+  <ul class="nav nav-tabs mb-4" id="listTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active fw-bold border-0" id="my-lists-tab" data-bs-toggle="tab" data-bs-target="#my-lists" type="button" role="tab">
-        My Lists
+      <button class="nav-link active fw-bold" id="my-lists-tab" data-bs-toggle="tab" data-bs-target="#my-lists" type="button" role="tab">
+        My Collections
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link fw-bold border-0" id="community-tab" data-bs-toggle="tab" data-bs-target="#community-lists" type="button" role="tab">
-        Community
+      <button class="nav-link fw-bold" id="community-tab" data-bs-toggle="tab" data-bs-target="#community-lists" type="button" role="tab">
+        Community Feed
       </button>
     </li>
   </ul>
@@ -44,7 +44,7 @@
               </div>
 
               {% if list.description and list.description|length > 100 %}
-              <button class="btn btn-link btn-sm p-0 mb-3 toggle-btn" data-target="list-desc-{{ list.id }}">Read More</button>
+              <button class="btn btn-link btn-sm p-0 text-main toggle-btn" data-target="list-desc-{{ list.id }}">Read More</button>
               {% endif %}
 
               <div class="mt-auto">
@@ -58,7 +58,7 @@
         </div>
         {% else %}
         <div class="col-12 text-center py-5">
-          <p class="text-muted">You haven't created any lists yet.</p>
+          <p class="text-secondary">You haven't created any lists yet.</p>
         </div>
         {% endfor %}
       </div>
@@ -72,7 +72,7 @@
           <div class="card h-100 shadow-sm border-0">
             <div class="card-body p-4 d-flex flex-column">
               <h5 class="card-title fw-bold">{{ list.name }}</h5>
-              <p class="text-muted small">Curated by: {{ list.owner.username }}</p>
+              <p class="text-secondary small">Curated by: {{ list.owner.username }}</p>
               <div
                 id="pub-desc-{{ list.id }}"
                 class="expandable-content collapsed {% if list.description and list.description|length > 100 %}is-long{% endif %}"
@@ -92,7 +92,7 @@
         </div>
         {% else %}
         <div class="col-12 text-center py-5">
-          <p class="text-muted">No public lists found in the community.</p>
+          <p class="text-secondary">No public lists found in the community.</p>
         </div>
         {% endfor %}
       </div>

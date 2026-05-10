@@ -28,9 +28,8 @@
           <div class="d-flex align-items-center mt-2">
             <span class="text-secondary small me-2">Current:</span>
             <img
-              src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_pic or 'user.png')) }}"
-              class="rounded-circle border"
-              style="width: 40px; height: 40px; object-fit: cover"
+              src="{{ url_for('static', filename='img/' + (current_user.profile_pic or 'user.png')) }}"
+              class="rounded-circle border avatar-preview-sm"
             />
           </div>
         </div>

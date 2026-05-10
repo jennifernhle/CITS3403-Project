@@ -1,42 +1,48 @@
-// JavaScript code for the logic behind user interactions
+document.addEventListener("DOMContentLoaded", function () {
+  const followBtn = document.getElementById("follow-button");
+  const followerCountSpan = document.getElementById("follower-count-value");
 
-// User following/unfollowing another user
-const followBtn = document.getElementById('follow-button');
-if (followBtn) {
-  followBtn.addEventListener('click', function() {
-    const userId = this.dataset.userId; // Get the user ID from the button's data attribute
-    const action = this.dataset.action; // Get the action (follow/unfollow) from the button's data attribute
+  if (followBtn) {
+    followBtn.addEventListener("click", function (e) {
+      e.preventDefault();
 
-    fetch(`/follow/${userId}/${action}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Update the button text and action based on the new state
-        if (data.action === 'follow') {
-          followBtn.textContent = 'Unfollow';
-          followBtn.dataset.action = 'unfollow';
-        } else {
-          followBtn.textContent = 'Follow';
-          followBtn.dataset.action = 'follow';
-        }
-        
-        // Update the follower count dynamically
-        const followerCountElement = document.getElementById('follower-count');
-        if (followerCountElement) {
-          followerCountElement.textContent = data.follower_count;
-        }
-      } else {
-        alert('An error occurred. Please try again.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+      const userId = this.getAttribute("data-user-id");
+      const currentAction = this.getAttribute("data-action");
+      const csrfToken = this.getAttribute("data-csrf-token");
+
+      this.disabled = true;
+
+      fetch(`/follow/${userId}/${currentAction}`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            if (followerCountSpan) {
+              followerCountSpan.textContent = data.follower_count;
+            }
+            this.setAttribute("data-action", data.action);
+
+            if (data.action === "unfollow") {
+              // Currenly following, so now showing 'Unfollow'
+              this.textContent = "Unfollow";
+              this.className = "btn btn-primary";
+            } else {
+              // Currently not following, so now showing 'Follow'
+              this.textContent = "Follow";
+              this.className = "btn btn-outline-primary";
+            }
+          }
+        })
+        .catch((error) => console.error("Error:", error))
+        .finally(() => {
+          this.disabled = false;
+          this.blur();
+        });
     });
-  });
-}
+  }
+});
