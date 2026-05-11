@@ -1,20 +1,10 @@
-{% extends "base.html" %} {% block title %}{{ title }}{% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block title %}{{ title }}{% endblock %} {% block content %}
 
 <div class="container">
   <div class="row justify-content-md-center mt-4 px-3" id="login">
     <h2 class="text-center fw-bold my-4" id="title">Welcome back!</h2>
-    <div
-      class="col-12 col-md-8 col-lg-5 col-xl-4 mt-2 px-3 p-3"
-      id="login-card"
-    >
-      <form
-        class="login-form"
-        id="login-form"
-        action=""
-        accept-charset="UTF-8"
-        method="post"
-      >
+    <div class="col-12 col-md-8 col-lg-5 col-xl-4 mt-2 px-3 p-3" id="login-card">
+      <form class="login-form" id="login-form" action="" accept-charset="UTF-8" method="post">
         {{ form.hidden_tag() }}
         <div class="form-group my-3">
           {{ form.email.label(class="form-label") }}
@@ -22,12 +12,9 @@ content %}
             <span class="input-group-text bg-white border-end-0">
               <i class="bi bi-envelope text-secondary"> </i>
             </span>
-            {{ form.email(class="form-control", id="login-email",
-            placeholder="Type your email address") }}
+            {{ form.email(class="form-control", id="login-email", placeholder="Type your email address") }}
           </div>
-          <div id="emailHelp" class="form-text small">
-            We'll never share your email with anyone else.
-          </div>
+          <div id="emailHelp" class="form-text small">We'll never share your email with anyone else.</div>
         </div>
 
         <div class="form-group my-3">
@@ -36,41 +23,19 @@ content %}
             <span class="input-group-text bg-white border-end-0">
               <i class="bi bi-lock text-secondary"></i>
             </span>
-            {{ form.password(class="form-control", id="login-password",
-            placeholder="Type your password") }}
-            <span
-              class="input-group-text bg-white toggle-password cursor-pointer"
-            >
+            {{ form.password(class="form-control", id="login-password", placeholder="Type your password") }}
+            <span class="input-group-text bg-white toggle-password cursor-pointer">
               <i class="bi bi-eye-slash"></i>
             </span>
           </div>
         </div>
 
-        <div class="d-flex justify-content-between mb-3 align-items-center">
-          <div class="form-check">
-            {{ form.remember(class="form-check-input", id="remember-me") }} {{
-            form.remember.label(class="form-check-label small text-secondary")
-            }}
-          </div>
-          <a
-            href="{{ url_for('main.forgot_password') }}"
-            class="small text-decoration-none"
-            >Forgot password?</a
-          >
-        </div>
-
-        <div class="d-grid gap-2 mt-4">
-          {{ form.submit(class="btn btn-main submit-btn", id="submitBtn") }}
-        </div>
+        <div class="d-grid gap-2 mt-4">{{ form.submit(class="btn btn-main submit-btn", id="submitbtn") }}</div>
 
         <div class="text-center mt-4">
           <p class="small text-secondary mb-3">
             Don't have an account?
-            <a
-              href="{{ url_for('main.register') }}"
-              class="text-decoration-none"
-              >Register now</a
-            >
+            <a href="{{ url_for('main.register') }}" class="text-decoration-none">Register now</a>
           </p>
         </div>
       </form>
