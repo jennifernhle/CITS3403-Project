@@ -20,7 +20,7 @@ class Config:
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite3:///:memory:"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     # Disabling of CSRF forms protection for testing
     WTF_CSRF_ENABLED = False
     USE_TMDB_API = False
