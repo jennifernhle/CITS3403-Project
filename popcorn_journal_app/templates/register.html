@@ -1,20 +1,10 @@
-{% extends "base.html" %} {% block title %}{{title}}{% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block title %}{{title}}{% endblock %} {% block content %}
 
 <div class="container">
   <div class="row justify-content-md-center mt-4 px-3" id="login">
     <h2 class="text-center fw-bold my-4" id="title">Join Popcorn Journal</h2>
-    <div
-      class="col-12 col-md-8 col-lg-5 col-xl-4 mt-2 px-3 p-3"
-      id="login-card"
-    >
-      <form
-        class="registration-form"
-        id="registration-form"
-        action="{{ url_for('main.register') }}"
-        accept-charset="UTF-8"
-        method="post"
-      >
+    <div class="col-12 col-md-8 col-lg-5 col-xl-4 mt-2 px-3 p-3" id="login-card">
+      <form class="registration-form" id="registration-form" action="{{ url_for('main.register') }}" accept-charset="UTF-8" method="post">
         {{ form.hidden_tag() }}
         <div class="form-group my-3">
           {{ form.email.label(class="form-label") }}
@@ -22,15 +12,12 @@ content %}
             <span class="input-group-text bg-white border-end-0">
               <i class="bi bi-envelope text-secondary"> </i>
             </span>
-            {{ form.email(class="form-control", id="login-email",
-            placeholder="Type your email address") }}
+            {{ form.email(class="form-control", id="login-email", placeholder="Type your email address") }}
           </div>
           {% for error in form.email.errors %}
           <div class="text-danger small">{{ error }}</div>
           {% endfor %}
-          <div id="emailHelp" class="form-text">
-            We'll never share your email with anyone else.
-          </div>
+          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
         </div>
 
         <div class="form-group my-3">
@@ -39,8 +26,7 @@ content %}
             <span class="input-group-text bg-white border-end-0">
               <i class="bi bi-person text-secondary"> </i>
             </span>
-            {{ form.username(class="form-control", id="username",
-            placeholder="Type your username") }}
+            {{ form.username(class="form-control", id="username", placeholder="Type your username") }}
           </div>
           {% for error in form.username.errors %}
           <div class="text-danger small">{{ error }}</div>
@@ -53,35 +39,28 @@ content %}
             <span class="input-group-text bg-white border-end-0">
               <i class="bi bi-lock text-secondary"></i>
             </span>
-            {{ form.password(class="form-control", id="login-password",
-            placeholder="Create password") }}
+            {{ form.password(class="form-control", id="login-password", placeholder="Create password") }}
             <span class="input-group-text bg-white toggle-password">
               <i class="bi bi-eye-slash"></i>
             </span>
           </div>
 
-          <div
-            id="password-requirements"
-            class="p-3 mt-2 border rounded bg-light shadow-sm"
-          >
+          <div id="password-requirements" class="p-3 mt-2 border rounded bg-light shadow-sm">
             <p class="fw-bold mb-2 small">Password Requirements:</p>
             <ul class="list-unstyled mb-0 small">
               <li id="length" class="invalid mb-1">8-20 characters</li>
               <li id="number" class="invalid mb-1">A number</li>
               <li id="lowerCase" class="invalid mb-1">A lowercase letter</li>
               <li id="upperCase" class="invalid mb-1">An uppercase letter</li>
-              <li id="specialCheck" class="valid mb-1">
-                No spaces/special characters
-              </li>
+              <li id="specialCheck" class="valid mb-1">No spaces/special characters</li>
             </ul>
           </div>
           {% for error in form.password.errors %}
           <div class="text-danger small">{{ error }}</div>
           {% endfor %}
           <div id="passwordHelpBlock" class="form-text">
-            Your password must be 8-20 characters long, contain numbers and
-            letters (lowercase and uppercase), and must not contain spaces,
-            special characters, or emoji.
+            Your password must be 8-20 characters long, contain numbers and letters (lowercase and uppercase), and must not contain spaces, special
+            characters, or emoji.
           </div>
         </div>
 
@@ -91,8 +70,7 @@ content %}
             <span class="input-group-text bg-white border-end-0">
               <i class="bi bi-lock text-secondary"></i>
             </span>
-            {{ form.confirm_password(class="form-control",
-            id="confirm-password", placeholder="Confirm password") }}
+            {{ form.confirm_password(class="form-control", id="confirm-password", placeholder="Confirm password") }}
             <span class="input-group-text bg-white toggle-password">
               <i class="bi bi-eye-slash"></i>
             </span>
@@ -103,16 +81,12 @@ content %}
           {% endfor %}
         </div>
 
-        <div class="d-grid gap-2 mt-4">
-          {{ form.submit(class="btn btn-main submit-btn", id="submitBtn") }}
-        </div>
+        <div class="d-grid gap-2 mt-4">{{ form.submit(class="btn btn-main submit-btn", id="submitbtn") }}</div>
 
         <div class="text-center mt-4">
           <p class="small text-secondary mb-3">
             Already have an account?
-            <a href="{{ url_for('main.login') }}" class="text-decoration-none"
-              >Sign in</a
-            >
+            <a href="{{ url_for('main.login') }}" class="text-decoration-none">Sign in</a>
           </p>
         </div>
       </form>

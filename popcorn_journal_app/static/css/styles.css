@@ -24,6 +24,18 @@ body {
   color: var(--text-main);
 }
 
+a {
+  color: var(--accent-red);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-weight: 500;
+}
+
+a:hover {
+  color: var(--accent-yellow);
+  text-decoration: underline;
+}
+
 /* BUTTONS */
 .btn-main {
   --bs-btn-font-weight: 600;

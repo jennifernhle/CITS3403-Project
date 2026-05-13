@@ -6,7 +6,10 @@ load_dotenv()
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-key-placeholder')
+    # Loads SECRET_KEY from environment variables
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    if not SECRET_KEY:
+        raise ValueError("No SECRET_KEY set for Flask application")
     instance_path = os.path.join(basedir, 'instance')
     os.makedirs(instance_path, exist_ok=True)
 

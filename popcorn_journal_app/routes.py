@@ -368,7 +368,7 @@ def create_list():
     )
 
     if movie_id:
-        movie = Movie.query.get(movie_id)
+        movie = Movie.query.get_or_404(movie_id)
         if movie:
             new_list.movies.append(movie)
 
