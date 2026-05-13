@@ -18,8 +18,8 @@
           @{{ current_user.username }} • Joined {{ current_user.member_since.strftime('%B %Y') if current_user.member_since else '2026' }}
         </p>
         <div id="profile-statistics" class="d-flex gap-3 mb-3">
-          <span class="small"><strong id="follower-count-value">{{ follower_count }}</strong> Followers</span>
-          <span class="small"><strong>{{ following_count }}</strong> Following</span>
+          <span class="small"><strong id="follower-count-value">{{ current_user.followers.count() }}</strong> Followers</span>
+          <span class="small"><strong>{{ current_user.following.count() }}</strong> Following</span>
           <span class="small"><strong>{{ current_user.logged_movie_count }}</strong> Reviews</span>
           <span class="small"><strong>{{ current_user.list_count }}</strong> Lists</span>
         </div>
@@ -46,6 +46,52 @@
           </section>
 
           <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold mb-0">My Favourite Movies</h5>
+            </div>
+
+            <div class="favourite-movies-grid">
+
+              {% for movie in current_user.favourite_movies %}
+              <div class="favourite-movie-slot">
+                <div class="card h-100 border-0 shadow-sm bg-dark-subtle favourite-card">
+
+                  <img
+                    src="{{ ('https://image.tmdb.org/t/p/w500' + movie.movie_img)
+                      if (movie.tmdb_id and movie.movie_img)
+                      else url_for('static', filename='posters/' + (movie.movie_img or 'default.jpg')) }}"
+                    class="card-img-top favourite-poster"
+                    alt="{{ movie.title }}"
+                  />
+
+                  <div class="card-body p-2 d-flex flex-column">
+                    <h6 class="card-title small fw-bold mb-1 text-truncate">
+                      {{ movie.title }}
+                    </h6>
+
+                    <p class="card-text text-secondary small mb-2">
+                      {{ movie.release_year }}
+                    </p>
+
+                    <a
+                      href="{{ url_for('main.movie_detail', movie_id=movie.id) }}"
+                      class="btn btn-outline-light btn-sm mt-auto"
+                    >
+                      View
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+              {% for i in range(4 - current_user.favourite_movies.count()) %}
+              <div class="favourite-movie-slot">
+                <div class="empty-favourite-slot"></div>
+              </div>
+              {% endfor %}
+            </div>
+          </section>
+          
+          <section class="mb-4">
             <h5 class="fw-bold mb-4">Recent Reviews</h5>
             {% if recent_reviews %} {% for review in recent_reviews %}
             <div class="card border-0 shadow-sm mb-3">
