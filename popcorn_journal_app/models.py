@@ -36,6 +36,7 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(64), nullable=True)
     profile_pic = db.Column(db.String(120), default='user.png')
     bio = db.Column(db.String(256), nullable=True)
+    last_login = db.Column(db.DateTime, nullable=True)
 
     # Relationships
     watchlist = db.relationship('Movie', secondary=watchlist_items, backref=db.backref('interested_users', lazy='dynamic'))
