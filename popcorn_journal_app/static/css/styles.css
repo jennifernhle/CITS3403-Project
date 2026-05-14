@@ -161,6 +161,27 @@ a:hover {
   margin: 0 auto;
 }
 
+.search-container {
+  position: relative;
+  z-index: 100;
+}
+
+#searchResultsList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin: 2px 1rem 0 1rem;
+}
+
+.col-lg-4 .card:not(.search-container) {
+  position: relative;
+  z-index: 1;
+}
+
 /* FEATURES AND REVIEWS */
 .about-feature-box {
   background-color: var(--card-bg);

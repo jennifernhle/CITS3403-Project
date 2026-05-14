@@ -621,3 +621,16 @@ def safe_float(val, default=0.0):
 
 def tmdb_api_available():
     return current_app.config.get('USE_TMDB_API', False) and bool(current_app.config.get('TMDB_API_KEY'))
+
+@bp.route('/api/search-users')
+@login_required
+def api_search_users():
+    query = request.args.get('q', '').strip()
+    if not query:
+        return jsonify([])
+    # Limited to 5 results, and case-insensitive
+    users = User.query.filter(User.username.ilike(f'%{query}%')).limit(5).all()
+    results = []
+    for user in users:
+        results.append({'username': user.username, 'id': user.id, 'profile_pic': url_for('static', filename='img/' + (user.profile_pic or 'user.png'))})
+    return jsonify(results)
