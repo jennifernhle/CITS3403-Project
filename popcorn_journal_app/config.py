@@ -13,13 +13,20 @@ class Config:
     instance_path = os.path.join(basedir, 'instance')
     os.makedirs(instance_path, exist_ok=True)
 
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', f"sqlite:///{os.path.join(instance_path, 'popcorn_journal.sqlite3')}")
+    db_url = os.getenv('DATABASE_URL')
+    if db_url:
+        SQLALCHEMY_DATABASE_URI = db_url
+    else:
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(instance_path, 'popcorn_journal.sqlite3')}"
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # TMDB API integration
-    TMDB_API_KEY = os.getenv('TMDB_API_KEY')
+    raw_key = os.getenv('TMDB_API_KEY')
+    TMDB_API_KEY = raw_key if raw_key and raw_key.strip() else None
     TMDB_BASE_URL = "https://api.themoviedb.org/3"
-    USE_TMDB_API = os.getenv('USE_TMDB_API', 'True').lower() in ('1', 'true', 'yes')
+
+    USE_TMDB_API = (os.getenv('USE_TMDB_API', 'False').lower() in ('1', 'true', 'yes')) and (TMDB_API_KEY is not None)
 
 class TestingConfig(Config):
     TESTING = True
