@@ -225,8 +225,7 @@
           {% else %}
           <div class="text-center py-5 bg-white rounded shadow-sm border">
             <i class="bi bi-people text-secondary fs-1"></i>
-            <p class="text-secondary mt-3">Follow users to see their reviews in this feed!</p>
-            <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-sm">Discover People</a>
+            <p class="text-secondary mt-3">Follow users to see their reviews in this feed.</p>
           </div>
           {% endfor %} {% if following_pagination and following_pagination.pages > 1 %}
           <nav aria-label="Following pagination" class="mt-4">
