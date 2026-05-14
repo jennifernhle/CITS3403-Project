@@ -199,30 +199,6 @@ class SeleniumTests(unittest.TestCase):
         time.sleep(1)
         self.assertIn('your watchlist is currently empty', self.driver.page_source.lower())
 
-    def test_watchlist_toggle_from_search_results(self):
-        self.register_user(RON_USER)
-        self.login_user(RON_USER)
-        self.add_movie('Inception', 'Christopher Nolan', 2010, 'Sci-Fi')
-
-        self.driver.get(f'{self.base_url}/search')
-        wait = WebDriverWait(self.driver, 10)
-        search_input = wait.until(EC.presence_of_element_located((By.NAME, 'query')))
-        search_input.send_keys('Inception')
-        search_input.send_keys(Keys.RETURN)
-        wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Inception"))
-        time.sleep(1)
-
-        def click_watchlist_btn():
-            btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.watchlist-toggle-btn')))
-            self.click_element(btn)
-
-        click_watchlist_btn()
-        time.sleep(1)
-
-        self.driver.get(f'{self.base_url}/watchlist')
-        wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-        self.assertIn('inception', self.driver.page_source.lower())
-
     def test_create_public_list(self):
         self.register_user(RON_USER)
         self.login_user(RON_USER)

@@ -17,12 +17,6 @@
         <p class="text-secondary mb-2">
           @{{ current_user.username }} • Joined {{ current_user.member_since.strftime('%B %Y') if current_user.member_since else '2026' }}
         </p>
-        <div id="profile-statistics" class="d-flex gap-3 mb-3">
-          <span class="small"><strong id="follower-count-value">{{ follower_count }}</strong> Followers</span>
-          <span class="small"><strong>{{ following_count }}</strong> Following</span>
-          <span class="small"><strong>{{ current_user.logged_movie_count }}</strong> Reviews</span>
-          <span class="small"><strong>{{ current_user.list_count }}</strong> Lists</span>
-        </div>
       </div>
     </div>
   </div>
