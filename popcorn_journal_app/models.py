@@ -23,6 +23,13 @@ review_likes = db.Table('review_likes',
     db.Column('review_id', db.Integer, db.ForeignKey('review.id'), primary_key=True)
 )
 
+favourite_movies = db.Table('favourite_movies',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id', ondelete='CASCADE'), primary_key=True)
+)
+
+
+
 # Models
 class User(db.Model, UserMixin):
     # User information
@@ -43,6 +50,7 @@ class User(db.Model, UserMixin):
     reviews = db.relationship('Review', backref='author', lazy='dynamic', cascade='all, delete-orphan')
     liked_reviews = db.relationship('Review', secondary=review_likes, backref=db.backref('likes', lazy='dynamic'), lazy='dynamic')
     lists = db.relationship('List', backref='owner', lazy='dynamic', cascade='all, delete-orphan')
+    favourite_movies = db.relationship('Movie', secondary=favourite_movies, backref=db.backref('favourited_by', lazy='dynamic'), lazy='dynamic')
     following = db.relationship('User', secondary=followers, primaryjoin=(followers.c.follower_id == id), secondaryjoin=(followers.c.followed_id == id), backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     # Password management
@@ -70,6 +78,21 @@ class User(db.Model, UserMixin):
     @property
     def logged_movie_count(self):
         return self.reviews.count()
+
+    # Count of lists created by user
+    @property
+    def list_count(self):
+        return self.lists.count()
+    
+    # Count of followers
+    @property
+    def follower_count(self):
+        return self.followers.count()
+    
+    # Count of following
+    @property
+    def following_count(self):
+        return self.following.count()
 
     def __repr__(self):
         return f'<User {self.username}>'

@@ -99,7 +99,6 @@ def profile():
     if not current_user.is_authenticated:
         flash('Please log in to view your profile.')
         return redirect(url_for('main.login'))
-    
     user = current_user
     page = request.args.get('page', 1, type=int)
     reviews_pagination = user.reviews.order_by(Review.date_posted.desc()).paginate(page=page, per_page=5, error_out=False)
@@ -131,6 +130,24 @@ def edit_profile():
         form.last_name.data = current_user.last_name
         form.bio.data = current_user.bio
     return render_template('settings.html', title='Edit Profile', form=form)
+
+@bp.route('/reset-profile-pic', methods=['POST'])
+@login_required
+def reset_profile_pic():
+    default_image = 'user.png'
+    previous_image = current_user.profile_pic
+    current_user.profile_pic = default_image
+
+    if previous_image and previous_image != default_image:
+        image_path = os.path.join(current_app.root_path, 'static', 'img', previous_image)
+        if os.path.exists(image_path):
+            try:
+                os.remove(image_path)
+            except OSError:
+                pass
+
+    db.session.commit()
+    return jsonify({'success': True, 'redirect': url_for('main.edit_profile')})
 
 @bp.route('/user/<int:user_id>')
 def other_user(user_id):
@@ -356,6 +373,18 @@ def create_list():
 
     next_page = request.args.get('next')
 
+    # Validation to ensure list name does not already exist for current user
+    existing = List.query.filter_by(name=name, user_id=current_user.id).first()
+    if existing:
+        flash("You already have a list with that name. Please choose a different name.", "warning")
+        return redirect(next_page or url_for('main.lists'))
+    
+    # Validation to prevent naming list "Watchlist"
+    if name == "Watchlist":
+        flash("You cannot name your list 'Watchlist'.", "warning")
+        return redirect(next_page or url_for('main.lists'))
+    
+    # Validation to ensure list has a name
     if not name:
         flash("List name is required!", "warning")
         return redirect(next_page or url_for('main.lists'))
@@ -483,6 +512,37 @@ def toggle_watchlist(movie_id):
     
     db.session.commit()
     return jsonify({'success': True, 'action': action})
+
+@bp.route('/favourite-movie/<int:movie_id>/add', methods=['POST'])
+@login_required
+def add_favourite_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    
+    # Check if movie is already a favourite
+    if movie in current_user.favourite_movies:
+        return jsonify({'success': False, 'error': 'Movie is already in your favourites.'}), 400
+    
+    # Check if user already has 4 favourites
+    if current_user.favourite_movies.count() >= 4:
+        return jsonify({'success': False, 'error': 'You can only have a maximum of 4 favourite movies.'}), 400
+    
+    current_user.favourite_movies.append(movie)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Added to your favourites!'})
+
+@bp.route('/favourite-movie/<int:movie_id>/remove', methods=['POST'])
+@login_required
+def remove_favourite_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    
+    if movie in current_user.favourite_movies:
+        current_user.favourite_movies.remove(movie)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Removed from your favourites.'})
+    
+    return jsonify({'success': False, 'error': 'Movie not in your favourites.'}), 400
+
 
 @bp.route('/user/delete/<int:user_id>', methods=['POST']) # delete user account
 @login_required

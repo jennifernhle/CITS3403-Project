@@ -50,10 +50,67 @@
         <div class="tab-pane fade show active" id="overview">
           <section class="mb-5">
             <h5 class="fw-bold text-uppercase small text-secondary mb-3">About</h5>
-            <p class="lead text-secondary" style="font-size: 1rem">{{ user.bio if user.bio else 'I have a passion for cinema.' }}</p>
+            <p class="lead text-secondary" style="font-size: 1rem">{{ user.bio }}</p>
           </section>
 
+
           <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold mb-0">
+                {{ user.username }}'s Favourite Movies
+              </h5>
+
+              <span class="badge bg-main">
+                {{ user.favourite_movies.count() }}/4
+              </span>
+            </div>
+
+            <div class="favourite-movies-grid">
+
+              {% for movie in user.favourite_movies %}
+              <div class="favourite-movie-slot">
+
+                <div class="card shadow-sm favourite-card h-100">
+
+                  <img
+                    src="{{ ('https://image.tmdb.org/t/p/w500' + movie.movie_img)
+                      if (movie.tmdb_id and movie.movie_img)
+                      else url_for('static', filename='posters/' + (movie.movie_img or 'default.jpg')) }}"
+                    class="card-img-top favourite-poster"
+                    alt="{{ movie.title }}"
+                  />
+
+                  <div class="card-body p-2 d-flex flex-column">
+
+                    <h6 class="card-title fw-bold small mb-1 text-truncate">
+                      {{ movie.title }}
+                    </h6>
+
+                    <p class="card-text text-secondary small mb-2">
+                      {{ movie.release_year }}
+                    </p>
+
+                    <a
+                      href="{{ url_for('main.movie_detail', movie_id=movie.id) }}"
+                      class="btn btn-outline-secondary btn-sm mt-auto"
+                    >
+                      View
+                    </a>
+
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+
+              {% for i in range(4 - user.favourite_movies.count()) %}
+              <div class="favourite-movie-slot">
+                <div class="empty-favourite-slot"></div>
+              </div>
+              {% endfor %}
+
+            </div>
+          </section>
+          <section>
             <h5 class="fw-bold mb-4">Recent Reviews</h5>
             {% if recent_reviews %} {% for review in recent_reviews %}
             <div class="card border-0 shadow-sm mb-3">
@@ -114,7 +171,7 @@
                   class="list-group-item list-group-item-action d-flex align-items-center gap-3"
                 >
                   <img
-                    src="{{ url_for('static', filename='img/' + (user.profile_pic if user.profile_pic else 'user.png')) }}"
+                    src="{{ url_for('static', filename='img/' + (followed.profile_pic or 'user.png')) }}"
                     width="35"
                     height="35"
                     class="rounded-circle border"
@@ -135,7 +192,7 @@
                   class="list-group-item list-group-item-action d-flex align-items-center gap-3"
                 >
                   <img
-                    src="{{ url_for('static', filename='img/' + (user.profile_pic if user.profile_pic else 'user.png')) }}"
+                    src="{{ url_for('static', filename='img/' + (follower.profile_pic or 'user.png')) }}"
                     width="35"
                     height="35"
                     class="rounded-circle border"

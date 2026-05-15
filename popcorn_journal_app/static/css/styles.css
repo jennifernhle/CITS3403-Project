@@ -227,6 +227,50 @@ a:hover {
   max-height: 2000px;
 }
 
+/* PROFILE */
+.favourite-movies-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.favourite-movie-slot {
+  width: 135px;
+  flex-shrink: 0;
+}
+
+/* FAVOURITE MOVIE CARDS */
+.favourite-card {
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #edebe6;
+}
+
+.favourite-poster {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.empty-favourite-slot {
+  width: 100%;
+  height: 320px;
+  border-radius: 12px;
+  background-color: #edebe6;
+  border: 2px solid #eae8e4;
+}
+
+/* PROFILE SECTION SPACING */
+#about section {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+#about section:last-child {
+  border-bottom: none;
+}
+
 /* UTILITY AND INTERACTIONS */
 .valid {
   color: green;

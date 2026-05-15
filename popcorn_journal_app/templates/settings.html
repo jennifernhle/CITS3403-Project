@@ -31,12 +31,99 @@
               src="{{ url_for('static', filename='img/' + (current_user.profile_pic or 'user.png')) }}"
               class="rounded-circle border avatar-preview-sm"
             />
+            {% if current_user.profile_pic and current_user.profile_pic != 'user.png' %}
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm ms-3"
+              id="reset-profile-pic-btn"
+              data-csrf="{{ csrf_token() }}"
+            >
+              Remove
+            </button>
+            {% endif %}
           </div>
         </div>
         {{ form.submit(class="btn btn-main") }}
       </form>
     </div>
   </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">Your Favourite Movies</h5>
+        <span class="badge bg-main">
+          {{ current_user.favourite_movies.count() }}/4
+        </span>
+      </div>
+
+      <div class="favourite-movies-grid mb-4">
+
+        {% for movie in current_user.favourite_movies %}
+        <div class="favourite-movie-slot">
+
+          <div
+            class="card shadow-sm position-relative favourite-card h-100"
+            data-movie-id="{{ movie.id }}"
+          >
+
+            <img
+              src="{{ ('https://image.tmdb.org/t/p/w500' + movie.movie_img)
+                if (movie.tmdb_id and movie.movie_img)
+                else url_for('static', filename='posters/' + (movie.movie_img or 'default.jpg')) }}"
+              class="card-img-top favourite-poster"
+              alt="{{ movie.title }}"
+            />
+
+            <div class="card-body p-2 d-flex flex-column">
+              <h6 class="card-title fw-bold small mb-1 text-truncate">
+                {{ movie.title }}
+              </h6>
+
+              <p class="card-text text-secondary small mb-2">
+                {{ movie.release_year }}
+              </p>
+
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm mt-auto remove-favourite-btn"
+                data-movie-id="{{ movie.id }}"
+                data-csrf="{{ csrf_token() }}"
+              >
+                Remove
+              </button>
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+
+        {% for i in range(4 - current_user.favourite_movies.count()) %}
+        <div class="favourite-movie-slot">
+          <div class="empty-favourite-slot"></div>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      {% if current_user.favourite_movies.count() < 4 %}
+      <button
+        type="button"
+        class="btn btn-outline-main"
+        data-bs-toggle="modal"
+        data-bs-target="#addFavouriteModal"
+      >
+        <i class="bi bi-plus-lg me-2"></i>
+        Add Favourite Movie
+      </button>
+      {% endif %}
+
+    </div>
+  </div>
+
+
+
   <div class="card border-danger shadow-sm mb-4">
     <div class="card-body p-4">
       <h5 class="text-danger fw-bold mb-2">Danger Zone</h5>
@@ -44,6 +131,36 @@
       <button class="btn btn-outline-danger" id="delete-account-btn" data-user-id="{{ current_user.id }}" data-csrf="{{ csrf_token() }}">
         Delete Account
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Favourite Movie Modal -->
+<div class="modal fade" id="addFavouriteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Add Favourite Movie</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="favouriteSearch" class="form-label fw-bold">Search for a movie</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="favouriteSearch" 
+            placeholder="Type movie title..."
+            autocomplete="off"
+          />
+        </div>
+        <div id="favouriteSearchResults" class="row row-cols-1 row-cols-md-2 g-3">
+          <!-- Results will appear here -->
+        </div>
+        <div id="favouriteSearchEmpty" class="text-center text-secondary py-4">
+          <p>Start typing to search for movies to add as favourites.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
