@@ -225,8 +225,7 @@
           {% else %}
           <div class="text-center py-5 bg-white rounded shadow-sm border">
             <i class="bi bi-people text-secondary fs-1"></i>
-            <p class="text-secondary mt-3">Follow users to see their reviews in this feed!</p>
-            <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-sm">Discover People</a>
+            <p class="text-secondary mt-3">Follow users to see their reviews in this feed.</p>
           </div>
           {% endfor %} {% if following_pagination and following_pagination.pages > 1 %}
           <nav aria-label="Following pagination" class="mt-4">
@@ -264,6 +263,16 @@
     </div>
 
     <div class="col-lg-4">
+      <div class="card border-0 shadow-sm mb-4 search-container">
+        <div class="card-body p-3">
+          <h6 class="text-uppercase small fw-bold opacity-75 mb-3">Find Users</h6>
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-search text-secondary"></i></span>
+            <input type="text" id="userSearchInput" class="form-control form-control-sm" placeholder="Search usernames..." autocomplete="off" />
+          </div>
+          <ul id="searchResultsList" class="list-group"></ul>
+        </div>
+      </div>
       <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
